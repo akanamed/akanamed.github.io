@@ -11,16 +11,16 @@
     
     
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"express 서버 만드는 두가지 방법Express Genarator 이용12345$ // npm 5.2.0 버전 이상$ npx express-generator$$ // 이전버전$ npm install -g express-generator\n\n참고 : Express 공식사이트\nnpm init 이용123$ // package.json - custom 생성 여부. -y 옵션 시, 자동생성$ npm init -y$ npm install express --save\n위 방법 이용 시, 해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성\n12345678910var express = require('express');var app = express();app.get('/', function (req, res) &#123;  res.send('Hello World!');&#125;);app.listen(3000, function () &#123;  console.log('Example app listening on port 3000!');&#125;);","dateCreated":"2019-12-17T10:33:11+09:00","dateModified":"2019-12-17T11:12:36+09:00","datePublished":"2019-12-17T10:33:11+09:00","description":"","headline":"express server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/17/express-server/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/17/express-server/","keywords":"express"}</script>
-    <meta name="description" content="express 서버 만드는 두가지 방법Express Genarator 이용12345$ &#x2F;&#x2F; npm 5.2.0 버전 이상$ npx express-generator$$ &#x2F;&#x2F; 이전버전$ npm install -g express-generator  참고 : Express 공식사이트 npm init 이용123$ &#x2F;&#x2F; package.json - custom 생성 여부">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"\n\nExpress Genarator 이용npm 버전이 5.2.0 이상인 경우 아래의 npx 커맨드로 쉽게 생성할 수 있다.npx 설명 링크 : npx란 무엇인가?\n1$ npx express-generator\n\nnpm 버전이 이전 버전인 경우 글로벌 설치 후 express 서버를 만든다.\n12$ npm install -g express-generator$ express --view=pug [폴더명]\n\n참고 : Express 공식사이트\nnpm init 이용npm init 커맨드는 -y 옵션 여부에 따라 package.json 을 수동으로 생성할 지,자동으로 생성할 지 선택할 수 있다.-y 옵션을 붙이면 package.json 파일만 자동으로 생성된다.\npackage.json 설명 링크\n12$ npm init -y$ npm install express --save\n\n해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성한다.\n12345678910var express = require('express');var app = express();app.get('/', function (req, res) &#123;    res.send('Hello World!');&#125;);app.listen(3000, function () &#123;    console.log('Example app listening on port 3000!');&#125;);\n\n\n서버 실행\n1$ node app.js\n\nDone.","dateCreated":"2019-12-17T10:33:11+09:00","dateModified":"2019-12-17T15:12:38+09:00","datePublished":"2019-12-17T10:33:11+09:00","description":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.","headline":"express server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/17/express-server/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/17/express-server/","keywords":"express"}</script>
+    <meta name="description" content="express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="express server">
 <meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2019&#x2F;12&#x2F;17&#x2F;express-server&#x2F;index.html">
 <meta property="og:site_name" content="GameServerDevelop">
-<meta property="og:description" content="express 서버 만드는 두가지 방법Express Genarator 이용12345$ &#x2F;&#x2F; npm 5.2.0 버전 이상$ npx express-generator$$ &#x2F;&#x2F; 이전버전$ npm install -g express-generator  참고 : Express 공식사이트 npm init 이용123$ &#x2F;&#x2F; package.json - custom 생성 여부">
+<meta property="og:description" content="express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.">
 <meta property="og:locale" content="ko_KR">
 <meta property="article:published_time" content="2019-12-17T01:33:11.000Z">
-<meta property="article:modified_time" content="2019-12-17T02:12:36.376Z">
+<meta property="article:modified_time" content="2019-12-17T06:12:38.308Z">
 <meta property="article:author" content="akanamed">
 <meta property="article:tag" content="express">
 <meta name="twitter:card" content="summary">
@@ -247,12 +247,27 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <h2 id="express-서버-만드는-두가지-방법"><a href="#express-서버-만드는-두가지-방법" class="headerlink" title="express 서버 만드는 두가지 방법"></a>express 서버 만드는 두가지 방법</h2><h3 id="Express-Genarator-이용"><a href="#Express-Genarator-이용" class="headerlink" title="Express Genarator 이용"></a>Express Genarator 이용</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ // npm 5.2.0 버전 이상</span><br><span class="line">$ npx express-generator</span><br><span class="line">$</span><br><span class="line">$ // 이전버전</span><br><span class="line">$ npm install -g express-generator</span><br></pre></td></tr></table></figure>
+            <!-- excerpt -->
+<h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Express-Genarator-이용"><span class="toc-text">Express Genarator 이용</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#npm-init-이용"><span class="toc-text">npm init 이용</span></a></li></ol>
+<h3 id="Express-Genarator-이용"><a href="#Express-Genarator-이용" class="headerlink" title="Express Genarator 이용"></a>Express Genarator 이용</h3><p>npm 버전이 5.2.0 이상인 경우 아래의 <span class="highlight-text danger">npx</span> 커맨드로 쉽게 생성할 수 있다.<br>npx 설명 링크 : <a href="https://ljh86029926.gitbook.io/coding-apple-react/undefined/npm-npx" target="_blank" rel="noopener">npx란 무엇인가?</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npx express-generator</span><br></pre></td></tr></table></figure>
+
+<p>npm 버전이 이전 버전인 경우 글로벌 설치 후 express 서버를 만든다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g express-generator</span><br><span class="line">$ express --view=pug [폴더명]</span><br></pre></td></tr></table></figure>
 
 <p>참고 : <a href="https://expressjs.com/en/starter/generator.html" target="_blank" rel="noopener">Express 공식사이트</a></p>
-<h3 id="npm-init-이용"><a href="#npm-init-이용" class="headerlink" title="npm init 이용"></a>npm init 이용</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ // package.json - custom 생성 여부. -y 옵션 시, 자동생성</span><br><span class="line">$ npm init -y</span><br><span class="line">$ npm install express --save</span><br></pre></td></tr></table></figure>
-<p>위 방법 이용 시, 해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var express = require(<span class="string">'express'</span>);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, function (req, res) &#123;</span><br><span class="line">  res.send(<span class="string">'Hello World!'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>, function () &#123;</span><br><span class="line">  console.log(<span class="string">'Example app listening on port 3000!'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="npm-init-이용"><a href="#npm-init-이용" class="headerlink" title="npm init 이용"></a>npm init 이용</h3><p>npm init 커맨드는 -y 옵션 여부에 따라 package.json 을 수동으로 생성할 지,<br>자동으로 생성할 지 선택할 수 있다.<br>-y 옵션을 붙이면 package.json 파일만 자동으로 생성된다.</p>
+<p><a href="https://programmingsummaries.tistory.com/385" target="_blank" rel="noopener">package.json 설명 링크</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm init -y</span><br><span class="line">$ npm install express --save</span><br></pre></td></tr></table></figure>
+
+<p>해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성한다.</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var express = require(<span class="string">'express'</span>);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, function (req, res) &#123;</span><br><span class="line">    res.send(<span class="string">'Hello World!'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>, function () &#123;</span><br><span class="line">    console.log(<span class="string">'Example app listening on port 3000!'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+<p>서버 실행</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ node app.js</span><br></pre></td></tr></table></figure>
+
+<p>Done.</p>
             
 
 
@@ -350,7 +365,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="맨 위로">
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>
@@ -459,7 +474,7 @@
         
         <li class="post-action">
             
-                <a class="post-action-btn btn btn--default" href="#" aria-label="맨 위로">
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
             
                 <i class="fa fa-list" aria-hidden="true"></i>
             </a>

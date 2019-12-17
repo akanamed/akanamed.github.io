@@ -214,7 +214,7 @@
     <section class="postShorten-group main-content-wrap">
     
     
-    <article class="postShorten postShorten--thumbnailimg-bottom">
+    <article class="postShorten postShorten--thumbnailimg-right">
         <div class="postShorten-wrap">
             
             <div class="postShorten-header">
@@ -246,28 +246,17 @@
 
             </div>
             
-                <div class="postShorten-content">
-                    <h2 id="express-서버-만드는-두가지-방법"><a href="#express-서버-만드는-두가지-방법" class="headerlink" title="express 서버 만드는 두가지 방법"></a>express 서버 만드는 두가지 방법</h2><h3 id="Express-Genarator-이용"><a href="#Express-Genarator-이용" class="headerlink" title="Express Genarator 이용"></a>Express Genarator 이용</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ // npm 5.2.0 버전 이상</span><br><span class="line">$ npx express-generator</span><br><span class="line">$</span><br><span class="line">$ // 이전버전</span><br><span class="line">$ npm install -g express-generator</span><br></pre></td></tr></table></figure>
-
-<p>참고 : <a href="https://expressjs.com/en/starter/generator.html" target="_blank" rel="noopener">Express 공식사이트</a></p>
-<h3 id="npm-init-이용"><a href="#npm-init-이용" class="headerlink" title="npm init 이용"></a>npm init 이용</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ // package.json - custom 생성 여부. -y 옵션 시, 자동생성</span><br><span class="line">$ npm init -y</span><br><span class="line">$ npm install express --save</span><br></pre></td></tr></table></figure>
-<p>위 방법 이용 시, 해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성</p>
-<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var express = require(<span class="string">'express'</span>);</span><br><span class="line">var app = express();</span><br><span class="line"></span><br><span class="line">app.get(<span class="string">'/'</span>, function (req, res) &#123;</span><br><span class="line">  res.send(<span class="string">'Hello World!'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">app.listen(<span class="number">3000</span>, function () &#123;</span><br><span class="line">  console.log(<span class="string">'Example app listening on port 3000!'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+                <div class="postShorten-excerpt">
+                    <h2 id="express-서버-만드는-두가지-방법"><a href="#express-서버-만드는-두가지-방법" class="headerlink" title="express 서버 만드는 두가지 방법"></a>express 서버 만드는 두가지 방법</h2><p>이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에<br>초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.</p>
                     
+                        <a
+                            href="/2019/12/17/express-server/"
+                            class="postShorten-excerpt_link link"
+                            aria-label=": express server"
+                        >
+                            계속 읽기
+                        </a>
                         
-
-
-                    
-                    
-                        <p>
-                            <a
-                                href="/2019/12/17/express-server/#post-footer"
-                                class="postShorten-excerpt_link link"
-                                aria-label=""
-                            >
-                                댓글 공유
-                            </a>
-                        </p>
                     
                 </div>
             
