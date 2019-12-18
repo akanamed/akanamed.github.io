@@ -13,7 +13,7 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.\n\n\nExpress Genarator 이용npm 버전이 5.2.0 이상인 경우 아래의 npx 커맨드로 쉽게 생성할 수 있다.npx 설명 링크 : npx란 무엇인가?\n1$ npx express-generator\n\nnpm 버전이 이전 버전인 경우 글로벌 설치 후 express 서버를 만든다.\n12$ npm install -g express-generator$ express --view=pug [폴더명]\n\n참고 : Express 공식사이트\nnpm init 이용npm init 커맨드는 -y 옵션 여부에 따라 package.json 을 수동으로 생성할 지,자동으로 생성할 지 선택할 수 있다.-y 옵션을 붙이면 package.json 파일만 자동으로 생성된다.\npackage.json 설명 링크\n12$ npm init -y$ npm install express --save\n\n해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성한다.\n12345678910var express = require('express');var app = express();app.get('/', function (req, res) &#123;    res.send('Hello World!');&#125;);app.listen(3000, function () &#123;    console.log('Example app listening on port 3000!');&#125;);\n\n\n서버 실행\n1$ node app.js\n\nDone.\n","dateCreated":"2019-12-17T10:33:11+09:00","dateModified":"2019-12-17T17:52:25+09:00","datePublished":"2019-12-17T10:33:11+09:00","description":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.","headline":"express server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/17/express-server/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/17/express-server/","keywords":"express"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.\n\n\nExpress Genarator 이용npm 버전이 5.2.0 이상인 경우 아래의 npx 커맨드로 쉽게 생성할 수 있다.npx 설명 링크 : npx란 무엇인가?\n1$ npx express-generator\n\nnpm 버전이 이전 버전인 경우 글로벌 설치 후 express 서버를 만든다.\n12$ npm install -g express-generator$ express --view=pug [폴더명]\n\n참고 : Express 공식사이트\nnpm init 이용npm init 커맨드는 -y 옵션 여부에 따라 package.json 을 수동으로 생성할 지,자동으로 생성할 지 선택할 수 있다.-y 옵션을 붙이면 package.json 파일만 자동으로 생성된다.\npackage.json 설명 링크\n12$ npm init -y$ npm install express --save\n\n해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성한다.\n12345678910var express = require('express');var app = express();app.get('/', function (req, res) &#123;    res.send('Hello World!');&#125;);app.listen(3000, function () &#123;    console.log('Example app listening on port 3000!');&#125;);\n\n\n서버 실행\n1$ node app.js\n\nDone.\n","dateCreated":"2019-12-17T10:33:11+09:00","dateModified":"2019-12-17T17:52:25+09:00","datePublished":"2019-12-17T10:33:11+09:00","description":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.","headline":"express server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/17/express-server/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/17/express-server/","keywords":"express"}</script>
     <meta name="description" content="express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="express server">
@@ -40,6 +40,15 @@
 
     <!--STYLES END-->
     
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154750067-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-154750067-1');
+    </script>
+
 
     
     <link rel="canonical" href="https://akanamed.github.io/2019/12/17/express-server/">
@@ -144,15 +153,6 @@
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
-                    </a>
-            </li>
-            
-                <li class="sidebar-button">
-                    
-                        <a class="sidebar-button-link " href="/mailto" title="Mail">
-                    
-                        <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
-                        <span class="sidebar-button-desc">Mail</span>
                     </a>
             </li>
             
