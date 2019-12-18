@@ -11,6 +11,8 @@
     
     
     
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
+    
     <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.\n\n\nExpress Genarator 이용npm 버전이 5.2.0 이상인 경우 아래의 npx 커맨드로 쉽게 생성할 수 있다.npx 설명 링크 : npx란 무엇인가?\n1$ npx express-generator\n\nnpm 버전이 이전 버전인 경우 글로벌 설치 후 express 서버를 만든다.\n12$ npm install -g express-generator$ express --view=pug [폴더명]\n\n참고 : Express 공식사이트\nnpm init 이용npm init 커맨드는 -y 옵션 여부에 따라 package.json 을 수동으로 생성할 지,자동으로 생성할 지 선택할 수 있다.-y 옵션을 붙이면 package.json 파일만 자동으로 생성된다.\npackage.json 설명 링크\n12$ npm init -y$ npm install express --save\n\n해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성한다.\n12345678910var express = require('express');var app = express();app.get('/', function (req, res) &#123;    res.send('Hello World!');&#125;);app.listen(3000, function () &#123;    console.log('Example app listening on port 3000!');&#125;);\n\n\n서버 실행\n1$ node app.js\n\nDone.\n","dateCreated":"2019-12-17T10:33:11+09:00","dateModified":"2019-12-17T17:52:25+09:00","datePublished":"2019-12-17T10:33:11+09:00","description":"express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.","headline":"express server","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/17/express-server/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed","mailto"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/17/express-server/","keywords":"express"}</script>
     <meta name="description" content="express 서버 만드는 두가지 방법이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.">
 <meta property="og:type" content="blog">
@@ -40,7 +42,7 @@
     
 
     
-
+    <link rel="canonical" href="https://akanamed.github.io/2019/12/17/express-server/">
     
         
     
@@ -56,21 +58,13 @@
 <header id="header" data-behavior="4">
     <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
     <div class="header-title">
-        <a
-            class="header-title-link"
-            href="/"
-            aria-label=""
-        >
+        <a class="header-title-link" href="/" aria-label>
             GameServerDevelop
         </a>
     </div>
     
         
-            <a
-                class="header-right-picture "
-                href="#about"
-                aria-label="링크 열기: /#about"
-            >
+            <a class="header-right-picture " href="#about" aria-label="링크 열기: /#about">
         
         
         </a>
@@ -88,10 +82,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/"
-                            title="Home"
-                        >
+                        <a class="sidebar-button-link " href="/" title="Home">
                     
                         <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Home</span>
@@ -100,11 +91,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-categories"
-                            
-                            title="카테고리"
-                        >
+                        <a class="sidebar-button-link " href="/all-categories" title="카테고리">
                     
                         <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">카테고리</span>
@@ -113,11 +100,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-tags"
-                            
-                            title="태그"
-                        >
+                        <a class="sidebar-button-link " href="/all-tags" title="태그">
                     
                         <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">태그</span>
@@ -126,11 +109,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/all-archives"
-                            
-                            title="아카이브"
-                        >
+                        <a class="sidebar-button-link " href="/all-archives" title="아카이브">
                     
                         <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">아카이브</span>
@@ -139,11 +118,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link open-algolia-search"
-                             href="#search"
-                            
-                            title="검색"
-                        >
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="검색">
                     
                         <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">검색</span>
@@ -152,11 +127,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="#about"
-                            
-                            title="About"
-                        >
+                        <a class="sidebar-button-link " href="#about" title="About">
                     
                         <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">About</span>
@@ -169,7 +140,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="noopener" title="GitHub">
+                        <a class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="external nofollow noopener noreferrer" title="GitHub">
                     
                         <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">GitHub</span>
@@ -178,10 +149,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/mailto"
-                            title="Mail"
-                        >
+                        <a class="sidebar-button-link " href="/mailto" title="Mail">
                     
                         <i class="sidebar-button-icon fa fa-envelope" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">Mail</span>
@@ -194,11 +162,7 @@
             
                 <li class="sidebar-button">
                     
-                        <a  class="sidebar-button-link "
-                             href="/atom.xml"
-                            
-                            title="RSS"
-                        >
+                        <a class="sidebar-button-link " href="/atom.xml" title="RSS">
                     
                         <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
                         <span class="sidebar-button-desc">RSS</span>
@@ -211,8 +175,7 @@
 </nav>
 
             
-            <div id="main" data-behavior="4"
-                 class="
+            <div id="main" data-behavior="4" class="
                         hasCoverMetaIn
                         ">
                 
@@ -250,15 +213,15 @@
             <h2 id="express-서버-만드는-두가지-방법"><a href="#express-서버-만드는-두가지-방법" class="headerlink" title="express 서버 만드는 두가지 방법"></a>express 서버 만드는 두가지 방법</h2><p>이 글을 포스팅 하는 시점의 node 버전은 10.16.3 이며, 설치가 되어 있다는 가정하에<br>초 간단 express 웹 서버를 만드는 두가지 방법은 아래와 같다.</p>
 <a id="more"></a>
 <h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#express-서버-만드는-두가지-방법"><span class="toc-text">express 서버 만드는 두가지 방법</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Express-Genarator-이용"><span class="toc-text">Express Genarator 이용</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#npm-init-이용"><span class="toc-text">npm init 이용</span></a></li></ol></li></ol>
-<h3 id="Express-Genarator-이용"><a href="#Express-Genarator-이용" class="headerlink" title="Express Genarator 이용"></a>Express Genarator 이용</h3><p>npm 버전이 5.2.0 이상인 경우 아래의 <span class="highlight-text danger">npx</span> 커맨드로 쉽게 생성할 수 있다.<br>npx 설명 링크 : <a href="https://ljh86029926.gitbook.io/coding-apple-react/undefined/npm-npx" target="_blank" rel="noopener">npx란 무엇인가?</a></p>
+<h3 id="Express-Genarator-이용"><a href="#Express-Genarator-이용" class="headerlink" title="Express Genarator 이용"></a>Express Genarator 이용</h3><p>npm 버전이 5.2.0 이상인 경우 아래의 <span class="highlight-text danger">npx</span> 커맨드로 쉽게 생성할 수 있다.<br>npx 설명 링크 : <a href="https://ljh86029926.gitbook.io/coding-apple-react/undefined/npm-npx" target="_blank" rel="external nofollow noopener noreferrer">npx란 무엇인가?</a></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npx express-generator</span><br></pre></td></tr></table></figure>
 
 <p>npm 버전이 이전 버전인 경우 글로벌 설치 후 express 서버를 만든다.</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g express-generator</span><br><span class="line">$ express --view=pug [폴더명]</span><br></pre></td></tr></table></figure>
 
-<p>참고 : <a href="https://expressjs.com/en/starter/generator.html" target="_blank" rel="noopener">Express 공식사이트</a></p>
+<p>참고 : <a href="https://expressjs.com/en/starter/generator.html" target="_blank" rel="external nofollow noopener noreferrer">Express 공식사이트</a></p>
 <h3 id="npm-init-이용"><a href="#npm-init-이용" class="headerlink" title="npm init 이용"></a>npm init 이용</h3><p>npm init 커맨드는 -y 옵션 여부에 따라 package.json 을 수동으로 생성할 지,<br>자동으로 생성할 지 선택할 수 있다.<br>-y 옵션을 붙이면 package.json 파일만 자동으로 생성된다.</p>
-<p><a href="https://programmingsummaries.tistory.com/385" target="_blank" rel="noopener">package.json 설명 링크</a></p>
+<p><a href="https://programmingsummaries.tistory.com/385" target="_blank" rel="external nofollow noopener noreferrer">package.json 설명 링크</a></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm init -y</span><br><span class="line">$ npm install express --save</span><br></pre></td></tr></table></figure>
 
 <p>해당 작업 디렉토리에 app.js 파일을 하나 생성한 후 아래와 같은 코드를 작성한다.</p>
@@ -278,7 +241,7 @@
     <div id="post-footer" class="post-footer main-content-wrap">
         
             <div class="post-footer-tags">
-                <span class="text-color-light text-small">태그</span><br/>
+                <span class="text-color-light text-small">태그</span><br>
                 
     <a class="tag tag--primary tag--small t-link" href="/tags/express/" rel="tag">express</a>
 
@@ -290,10 +253,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
                         
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">이전</span>
@@ -301,10 +261,7 @@
             </li>
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
                         
                         <span class="hide-xs hide-sm text-small icon-mr">다음</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -314,11 +271,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="이 포스트 공유하기"
-            >
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -326,12 +279,7 @@
             
             
             <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/17/express-server/"
-                    title="Facebook에 공유하기"
-                    aria-label="Facebook에 공유하기"
-                >
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/17/express-server/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -339,12 +287,7 @@
             
             
             <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/17/express-server/"
-                    title="Twitter에 공유하기"
-                    aria-label="Twitter에 공유하기"
-                >
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/17/express-server/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -352,12 +295,7 @@
             
             
             <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/17/express-server/"
-                    title="Google+에 공유하기"
-                    aria-label="Google+에 공유하기"
-                >
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/17/express-server/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -399,10 +337,7 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
                         
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">이전</span>
@@ -410,10 +345,7 @@
             </li>
             <li class="post-action">
                 
-                    <a
-                        class="post-action-btn btn btn--disabled"
-                        aria-hidden="true"
-                    >
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
                         
                         <span class="hide-xs hide-sm text-small icon-mr">다음</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -423,11 +355,7 @@
     </nav>
     <ul class="post-actions post-action-share">
         <li class="post-action hide-lg hide-md hide-sm">
-            <a
-                class="post-action-btn btn btn--default btn-open-shareoptions"
-                href="#btn-open-shareoptions"
-                aria-label="이 포스트 공유하기"
-            >
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
                 <i class="fa fa-share-alt" aria-hidden="true"></i>
             </a>
         </li>
@@ -435,12 +363,7 @@
             
             
             <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/17/express-server/"
-                    title="Facebook에 공유하기"
-                    aria-label="Facebook에 공유하기"
-                >
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/17/express-server/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -448,12 +371,7 @@
             
             
             <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/17/express-server/"
-                    title="Twitter에 공유하기"
-                    aria-label="Twitter에 공유하기"
-                >
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/17/express-server/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -461,12 +379,7 @@
             
             
             <li class="post-action hide-xs">
-                <a
-                    class="post-action-btn btn btn--default"
-                    target="new" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/17/express-server/"
-                    title="Google+에 공유하기"
-                    aria-label="Google+에 공유하기"
-                >
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/17/express-server/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -494,12 +407,7 @@
                 
                 
                 <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/17/express-server/"
-                        aria-label="Facebook에 공유하기"
-                    >
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/17/express-server/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
                     </a>
                 </li>
@@ -507,12 +415,7 @@
                 
                 
                 <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/17/express-server/"
-                        aria-label="Twitter에 공유하기"
-                    >
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/17/express-server/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
                     </a>
                 </li>
@@ -520,12 +423,7 @@
                 
                 
                 <li class="share-option">
-                    <a
-                        class="share-option-btn"
-                        target="new"
-                        href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/17/express-server/"
-                        aria-label="Google+에 공유하기"
-                    >
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/17/express-server/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
                     </a>
                 </li>
@@ -553,7 +451,7 @@
         
             <div id="about-card-job">
                 <i class="fa fa-briefcase"></i>
-                <br/>
+                <br>
                 <p>Game Server</p>
 
             </div>
@@ -561,7 +459,7 @@
         
             <div id="about-card-location">
                 <i class="fa fa-map-marker-alt"></i>
-                <br/>
+                <br>
                 Seoul, Korea
             </div>
         
