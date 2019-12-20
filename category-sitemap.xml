@@ -8,6 +8,13 @@
     </url>
 
     <url>
+        <loc>https://akanamed.github.io/categories/mongodb/</loc>
+        <lastmod>2019-12-20T06:23:32.000Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://akanamed.github.io/categories/nodejs/</loc>
         <lastmod>2019-12-17T01:33:11.000Z</lastmod>
         <changefreq>weekly</changefreq>
