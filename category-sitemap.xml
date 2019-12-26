@@ -8,29 +8,29 @@
     </url>
 
     <url>
-        <loc>https://akanamed.github.io/categories/nodejs/eslint/</loc>
-        <lastmod>2019-12-26T09:45:27.155Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://akanamed.github.io/categories/nodejs/</loc>
-        <lastmod>2019-12-26T09:45:27.155Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/categories/mongodb/</loc>
-        <lastmod>2019-12-26T08:57:30.805Z</lastmod>
+        <lastmod>2019-12-26T09:54:57.189Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://akanamed.github.io/categories/hexo/</loc>
-        <lastmod>2019-12-26T08:57:16.867Z</lastmod>
+        <lastmod>2019-12-26T09:53:37.415Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/categories/mongodb/</loc>
+        <lastmod>2019-12-26T09:53:30.555Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/categories/nodejs/eslint/</loc>
+        <lastmod>2019-12-26T09:45:27.155Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
