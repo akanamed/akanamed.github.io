@@ -13,16 +13,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 /install directory/bin/mongod.cfg 에 위치한다.mongod.cfg 는 YAML 형식을 사용한다.( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)\n\n\n\nMongoDB 3.6부터는 기본적으로 localhost에 바인딩 되는데,외부에서도 접속하게 허용할려면 cfg를 수정해야한다.\ncommand로 현재 버전 확인12345678910$ mongo --versionMongoDB shell version v4.2.1git version: edf6d45851c0b9ee15548f0f847df141764a317eallocator: tcmallocmodules: nonebuild environment:    distmod: 2012plus    distarch: x86_64    target_arch: x86_64\n\ncfg 파일을 직접 변경에디터로 파일을 열게 되면, 아래와 같은 내용을 볼 수 있다.\nmongod.conf123456789101112131415161718192021222324252627282930 - for documentation of all options, see:   http:&#x2F;&#x2F;docs.mongodb.org&#x2F;manual&#x2F;reference&#x2F;configuration-options&#x2F;storage:  dbPath: C:\\Program Files\\MongoDB\\Server\\4.2\\data  journal:    enabled: true  engine:  mmapv1:  wiredTiger:- where to write logging data.systemLog:  destination: file  logAppend: true  path:  C:\\Program Files\\MongoDB\\Server\\4.2\\log\\mongod.log- network interfacesnet:  port: 27017  bindIp: 127.0.0.1processManagement:security:operationProfiling:replication:sharding:-- Enterprise-Only Options:auditLog:snmp:\n\nnet: bindIp를 0.0.0.0 으로 바꾸면 모든 ip주소에 바인딩이 되며, 외부에서도 접속할 수 있다.보안상의 이유로 허용할 ip만 접속하게 한다면, 아래처럼 기입하면 된다.\nmongod.conf123net:  port: 27017  bindIp: 127.0.0.1, 10.0.0.10, 10.0.0.25\n\n변경 후 mongo db server를 재시작 및 확인.\nmongo shell 에서 변경아래 처럼 –bind_ip 를 옵션으로 주게 되면, cfg 의 net: bind_ip 를 override 해서 mongodb 를 재시작한다.\n1$ mongod --bind_ip 0.0.0.0\n\nDone.\n","dateCreated":"2019-12-20T15:23:32+09:00","dateModified":"2019-12-20T15:23:32+09:00","datePublished":"2019-12-20T15:23:32+09:00","description":"mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 /install directory/bin/mongod.cfg 에 위치한다.mongod.cfg 는 YAML 형식을 사용한다.( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)","headline":"mongoDB config 세팅","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/20/mongoDB-config-%EC%84%B8%ED%8C%85/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/20/mongoDB-config-%EC%84%B8%ED%8C%85/","keywords":"mongodb"}</script>
-    <meta name="description" content="mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 &#x2F;install directory&#x2F;bin&#x2F;mongod.cfg 에 위치한다.mongod.cfg 는 YAML 형식을 사용한다.( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)">
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 /install directory/bin/mongod.cfg 에 위치한다.\n\n\n\nmongod.cfg 는 YAML 형식을 사용한다.( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)\nMongoDB 3.6부터는 기본적으로 localhost에 바인딩 되는데,외부에서도 접속하게 허용할려면 cfg를 수정해야한다.\ncommand로 현재 버전 확인12345678910$ mongo --versionMongoDB shell version v4.2.1git version: edf6d45851c0b9ee15548f0f847df141764a317eallocator: tcmallocmodules: nonebuild environment:    distmod: 2012plus    distarch: x86_64    target_arch: x86_64\n\ncfg 파일을 직접 변경에디터로 파일을 열게 되면, 아래와 같은 내용을 볼 수 있다.\nmongod.conf123456789101112131415161718192021222324252627282930 - for documentation of all options, see:   http:&#x2F;&#x2F;docs.mongodb.org&#x2F;manual&#x2F;reference&#x2F;configuration-options&#x2F;storage:  dbPath: C:\\Program Files\\MongoDB\\Server\\4.2\\data  journal:    enabled: true  engine:  mmapv1:  wiredTiger:- where to write logging data.systemLog:  destination: file  logAppend: true  path:  C:\\Program Files\\MongoDB\\Server\\4.2\\log\\mongod.log- network interfacesnet:  port: 27017  bindIp: 127.0.0.1processManagement:security:operationProfiling:replication:sharding:-- Enterprise-Only Options:auditLog:snmp:\n\nnet: bindIp를 0.0.0.0 으로 바꾸면 모든 ip주소에 바인딩이 되며, 외부에서도 접속할 수 있다.보안상의 이유로 허용할 ip만 접속하게 한다면, 아래처럼 기입하면 된다.\nmongod.conf123net:  port: 27017  bindIp: 127.0.0.1, 10.0.0.10, 10.0.0.25\n\n변경 후 mongo db server를 재시작 및 확인.\nmongo shell 에서 변경아래 처럼 –bind_ip 를 옵션으로 주게 되면, cfg 의 net: bind_ip 를 override 해서 mongodb 를 재시작한다.\n1$ mongod --bind_ip 0.0.0.0\n\nDone.\n","dateCreated":"2019-12-20T15:23:32+09:00","dateModified":"2019-12-26T17:57:30+09:00","datePublished":"2019-12-20T15:23:32+09:00","description":"mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 /install directory/bin/mongod.cfg 에 위치한다.","headline":"mongoDB config 세팅","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/20/mongoDB-config-%EC%84%B8%ED%8C%85/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/20/mongoDB-config-%EC%84%B8%ED%8C%85/","keywords":"mongodb"}</script>
+    <meta name="description" content="mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 &#x2F;install directory&#x2F;bin&#x2F;mongod.cfg 에 위치한다.">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="mongoDB config 세팅">
 <meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2019&#x2F;12&#x2F;20&#x2F;mongoDB-config-%EC%84%B8%ED%8C%85&#x2F;index.html">
 <meta property="og:site_name" content="GameServerDevelop">
-<meta property="og:description" content="mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 &#x2F;install directory&#x2F;bin&#x2F;mongod.cfg 에 위치한다.mongod.cfg 는 YAML 형식을 사용한다.( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)">
+<meta property="og:description" content="mongoDB cfg 설정하기MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 &#x2F;install directory&#x2F;bin&#x2F;mongod.cfg 에 위치한다.">
 <meta property="og:locale" content="ko_KR">
 <meta property="article:published_time" content="2019-12-20T06:23:32.000Z">
-<meta property="article:modified_time" content="2019-12-20T06:23:32.000Z">
+<meta property="article:modified_time" content="2019-12-26T08:57:30.805Z">
 <meta property="article:author" content="akanamed">
 <meta property="article:tag" content="mongodb">
 <meta name="twitter:card" content="summary">
@@ -207,7 +207,7 @@
         <span>LastUpdated  </span>
         <time datetime="2019-12-20T15:23:32+09:00">
             
-                    2019/12/20 15:23:32
+                    2019/12/26 17:57:30
                 
         </time>
     
@@ -217,7 +217,7 @@
         <span>LastUpdated  </span>
         <time datetime="2019-12-20T15:23:32+09:00">
             
-                    2019/12/20 15:23:32
+                    2019/12/26 17:57:30
                 
         </time>
     
@@ -228,10 +228,11 @@
     
     <div class="post-content markdown">
         <div class="main-content-wrap">
-            <h2 id="mongoDB-cfg-설정하기"><a href="#mongoDB-cfg-설정하기" class="headerlink" title="mongoDB cfg 설정하기"></a>mongoDB cfg 설정하기</h2><p>MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 /install directory/bin/mongod.cfg 에 위치한다.<br>mongod.cfg 는 YAML 형식을 사용한다.<br>( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)</p>
+            <h2 id="mongoDB-cfg-설정하기"><a href="#mongoDB-cfg-설정하기" class="headerlink" title="mongoDB cfg 설정하기"></a>mongoDB cfg 설정하기</h2><p>MongoDB 를 설치하게 되면 기본 구성파일은 Windows 기준으로 /install directory/bin/mongod.cfg 에 위치한다.</p>
 <a id="more"></a>
 <h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#mongoDB-cfg-설정하기"><span class="toc-text">mongoDB cfg 설정하기</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#command로-현재-버전-확인"><span class="toc-text">command로 현재 버전 확인</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#cfg-파일을-직접-변경"><span class="toc-text">cfg 파일을 직접 변경</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mongo-shell-에서-변경"><span class="toc-text">mongo shell 에서 변경</span></a></li></ol></li></ol></li></ol>
 
+<p>mongod.cfg 는 YAML 형식을 사용한다.<br>( YAML 은 들여 쓰기, 탭 문자가 지원되지 않고, 공백을 사용해야 한다.)</p>
 <p>MongoDB 3.6부터는 기본적으로 localhost에 바인딩 되는데,<br>외부에서도 접속하게 허용할려면 cfg를 수정해야한다.</p>
 <h3 id="command로-현재-버전-확인"><a href="#command로-현재-버전-확인" class="headerlink" title="command로 현재 버전 확인"></a>command로 현재 버전 확인</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ mongo --version</span><br><span class="line"></span><br><span class="line">MongoDB shell version v4.2.1</span><br><span class="line">git version: edf6d45851c0b9ee15548f0f847df141764a317e</span><br><span class="line">allocator: tcmalloc</span><br><span class="line">modules: none</span><br><span class="line">build environment:</span><br><span class="line">    distmod: 2012plus</span><br><span class="line">    distarch: x86_64</span><br><span class="line">    target_arch: x86_64</span><br></pre></td></tr></table></figure>
 
