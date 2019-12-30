@@ -3,8 +3,15 @@
 
 
     <url>
+        <loc>https://akanamed.github.io/tags/apiserver/</loc>
+        <lastmod>2019-12-30T03:26:30.971Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://akanamed.github.io/tags/express/</loc>
-        <lastmod>2019-12-30T03:24:41.429Z</lastmod>
+        <lastmod>2019-12-30T03:26:30.971Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
