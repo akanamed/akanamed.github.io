@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="GameServerDevelop">
+    <title>eslint configuration setting - GameServerDevelop</title>
+    <meta name="author" content="akanamed">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":".eslintrc.json 파일에서 rules 관련 옵션들을 추가한다.\n\n\n\n이전글 : node.js 환경에서 eslint 설정하기eslint 패키지를 설치하고 init 을 하면 아래와 같은 json 파일이 생성된다.\n12345678910111213141516171819&#123;    \"env\": &#123;        \"commonjs\": true,        \"es6\": true,        \"node\": true    &#125;,    \"extends\": [        \"airbnb-base\"    ],    \"globals\": &#123;        \"Atomics\": \"readonly\",        \"SharedArrayBuffer\": \"readonly\"    &#125;,    \"parserOptions\": &#123;        \"ecmaVersion\": 2018    &#125;,    \"rules\": &#123;    &#125;&#125;\neslint.json 의 rules 항목에는,추가한 rule을 error 로 설정해서 따르지 않으면 수정하게 에러를 뱉어내거나rule을 turn off 으로 설정해서 검사를 안하게 하는 등의 옵션들을 추가할 수 있다.\nrule 관련 수정Airbnb JavaScript Style Guide 깃헙 문서에 잘 나와있다.\nairbnb 스타일은 들여쓰기에 대해 강제하지는 않는 것 같다.보기좋게 4칸으로 고정하는 옵션을 추가한다.\n12345\"rules\": &#123;    \"indent\": [        \"error\",        4    ],\n\n아래 샘플로 작성한 파일이다. airbnb 스타일의 eslint 에서 에러로 표시되는 항목은 다음과 같다.\ntest.js12345678var express = require('express');var tempFunc = function(err) &#123;  return 1;&#125;;var testFunc = (err, function(next) &#123;  console.log('err');&#125;);\n\n\nno-var : var 대신에 let, const 사용1const express = require('express');\nimport/newline-after-import : import 및 require 선언 후 한줄 공백이 필요123const express = require('express');const tempFunc = function(err) &#123;\nspace-before-function-paren : 함수 괄호 앞에 공백이 필요1const tempFunc = function (err) &#123;\nprefer-arrow-callback: 콜백함수는 화살표 함수로 사용1const testFunc = (err, (next) =&gt; &#123;\nno-undef: 정의되지 않은 변수 사용, 여기서는 err 변수12const err = undefined;const testFunc = (err, (next) =&gt; &#123;\nfunc-names: 함수 표현식에 이름이 있어야함123const tempFunc = (err) =&gt; 1;orconst tempFunc = function test(err) &#123;\n\n\n\nno-console 은 콘솔 사용금지인데, node.js 환경에서 디버그 용도로 확인해야하므로turn off 설정해주자.no-unused-vars: 함수안의 파라미터가 선언은 되었지만 사용은 하지 않음인데,마찬가지로 rules 에 추가하여 turn off 로 제외시키자.\n“off” or 0 - 규칙 해제“warn” or 1 - 규칙을 경고로 설정“error” or 2 - 규칙을 오류로 설정\n123\"rules\": &#123;    \"no-unused-vars\": 0,    \"no-console\": 0\n\n최종 수정된 코드\ntest.js12345678const express = require('express');const tempFunc = (err) =&gt; 1;const err = undefined;const testFunc = (err, (next) =&gt; &#123;    console.log('err');&#125;);\n\n–fix 옵션으로 수정–fix 옵션으로 자동 수정을 해보자.\n123456$ .\\node_modules\\.bin\\eslint test.js --fix// 결과D:\\test\\test.js  3:18  warning  Unexpected unnamed function  func-names  7:19  error    'err' is not defined         no-undef  7:24  warning  Unexpected unnamed function  func-names\n\n거의 대부분은 다 자동으로 잡아주지만,func-names 는 warning 으로, no-undef 는 error 로 출력이 되었다.\n공식 도큐먼트에는 func-names 는 디버깅에 도움이 되도록 함수 표현식 이름을지정하라고 나와있다.함수 이름을 생략하면 함수에서 예외 발생 시, 스택에서 (anonymous function) 으로 표시된다.따라서 이름을 주던지, arrow function 으로 바꾸면 해결 할 수 있다.no-undef 는 변수 선언 시, 항상 const 혹은 let을 사용하라고 나와있다.\n최종 수정된 코드\ntest.js12345678const express = require('express');const tempFunc = (err) =&gt; 1;const err = undefined;const testFunc = (err, (next) =&gt; &#123;    console.log('err');&#125;);\n\nrules configuration거의 대부분은 airbnb 스타일에 따라 수정해가면 되지만, 그 외 조금 불필요한 옵션들이나설정해야하는 옵션들은 turn off 혹은 error 처리로 정의했다.\n1234567891011121314\"rules\": &#123;    \"semi\": [            \"error\",            \"always\"    ],    \"indent\": [        \"error\",        4    ],    \"no-unused-vars\": 0,    \"no-console\": 0,    \"keyword-spacing\": 0,               // if문 다음에 공백이 필요함.    \"comma-dangle\": [\"error\", \"never\"], // 후행 쉼표 허용안함&#125;","dateCreated":"2019-12-31T10:36:22+09:00","dateModified":"2019-12-31T15:06:20+09:00","datePublished":"2019-12-31T10:36:22+09:00","description":".eslintrc.json 파일에서 rules 관련 옵션들을 추가한다.","headline":"eslint configuration setting","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/31/eslint-configuration-setting/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/31/eslint-configuration-setting/","keywords":"eslint"}</script>
+    <meta name="description" content=".eslintrc.json 파일에서 rules 관련 옵션들을 추가한다.">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="eslint configuration setting">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2019&#x2F;12&#x2F;31&#x2F;eslint-configuration-setting&#x2F;index.html">
+<meta property="og:site_name" content="GameServerDevelop">
+<meta property="og:description" content=".eslintrc.json 파일에서 rules 관련 옵션들을 추가한다.">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2019-12-31T01:36:22.000Z">
+<meta property="article:modified_time" content="2019-12-31T06:06:20.369Z">
+<meta property="article:author" content="akanamed">
+<meta property="article:tag" content="eslint">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-nwznknlpu5uzp5nt2phtgypmwhpcm24qhsa79n33e49xlnzfdkpfn4eedqt9.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154750067-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-154750067-1');
+    </script>
+
+
+    
+    <link rel="canonical" href="https://akanamed.github.io/2019/12/31/eslint-configuration-setting/">
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/" aria-label>
+            GameServerDevelop
+        </a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about" aria-label="링크 열기: /#about">
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/" title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="카테고리">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">카테고리</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="태그">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">태그</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="아카이브">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">아카이브</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="검색">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">검색</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="external nofollow noopener noreferrer" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/rss2.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4" class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            eslint configuration setting
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2019-12-31T10:36:22+09:00">
+	
+		    2019/12/31 10:36:22
+    	
+    </time>
+    
+        <span>카테고리 </span>
+        
+    <a class="category-link" href="/categories/nodejs/">nodejs</a>, <a class="category-link" href="/categories/nodejs/eslint/">eslint</a>
+
+
+    
+    <br>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2019-12-31T10:36:22+09:00">
+            
+                    2019/12/31 15:06:20
+                
+        </time>
+    
+</div>
+<!-- <div>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2019-12-31T10:36:22+09:00">
+            
+                    2019/12/31 15:06:20
+                
+        </time>
+    
+</div> -->
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>.eslintrc.json 파일에서 rules 관련 옵션들을 추가한다.</p>
+<a id="more"></a>
+<h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#rule-관련-수정"><span class="toc-text">rule 관련 수정</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#–fix-옵션으로-수정"><span class="toc-text">–fix 옵션으로 수정</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rules-configuration"><span class="toc-text">rules configuration</span></a></li></ol>
+
+<p>이전글 : <a href="https://akanamed.github.io/2019/12/26/node-js-%ED%99%98%EA%B2%BD%EC%97%90%EC%84%9C-eslint-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/">node.js 환경에서 eslint 설정하기</a><br>eslint 패키지를 설치하고 init 을 하면 아래와 같은 json 파일이 생성된다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">"env"</span>: &#123;</span><br><span class="line">        <span class="string">"commonjs"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="string">"es6"</span>: <span class="literal">true</span>,</span><br><span class="line">        <span class="string">"node"</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"extends"</span>: [</span><br><span class="line">        <span class="string">"airbnb-base"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"globals"</span>: &#123;</span><br><span class="line">        <span class="string">"Atomics"</span>: <span class="string">"readonly"</span>,</span><br><span class="line">        <span class="string">"SharedArrayBuffer"</span>: <span class="string">"readonly"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"parserOptions"</span>: &#123;</span><br><span class="line">        <span class="string">"ecmaVersion"</span>: 2018</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"rules"</span>: &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>eslint.json 의 rules 항목에는,<br>추가한 rule을 error 로 설정해서 따르지 않으면 수정하게 에러를 뱉어내거나<br>rule을 turn off 으로 설정해서 검사를 안하게 하는 등의 옵션들을 추가할 수 있다.</p>
+<h3 id="rule-관련-수정"><a href="#rule-관련-수정" class="headerlink" title="rule 관련 수정"></a>rule 관련 수정</h3><p><a href="https://github.com/airbnb/javascript" target="_blank" rel="external nofollow noopener noreferrer">Airbnb JavaScript Style Guide</a> 깃헙 문서에 잘 나와있다.</p>
+<p>airbnb 스타일은 들여쓰기에 대해 강제하지는 않는 것 같다.<br>보기좋게 4칸으로 고정하는 옵션을 추가한다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"rules"</span>: &#123;</span><br><span class="line">    <span class="string">"indent"</span>: [</span><br><span class="line">        <span class="string">"error"</span>,</span><br><span class="line">        4</span><br><span class="line">    ],</span><br></pre></td></tr></table></figure>
+
+<p>아래 샘플로 작성한 파일이다. airbnb 스타일의 eslint 에서 에러로 표시되는 항목은 다음과 같다.</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var express = require(<span class="string">'express'</span>);</span><br><span class="line">var tempFunc = function(err) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">var testFunc = (err, function(next) &#123;</span><br><span class="line">  console.log(<span class="string">'err'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>no-var : var 대신에 let, const 사용<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const express = require(<span class="string">'express'</span>);</span><br></pre></td></tr></table></figure></li>
+<li>import/newline-after-import : import 및 require 선언 후 한줄 공백이 필요<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const express = require(<span class="string">'express'</span>);</span><br><span class="line"></span><br><span class="line">const tempFunc = <span class="keyword">function</span>(err) &#123;</span><br></pre></td></tr></table></figure></li>
+<li>space-before-function-paren : 함수 괄호 앞에 공백이 필요<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const tempFunc = <span class="keyword">function</span> (err) &#123;</span><br></pre></td></tr></table></figure></li>
+<li>prefer-arrow-callback: 콜백함수는 화살표 함수로 사용<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">const testFunc = (err, (next) =&gt; &#123;</span><br></pre></td></tr></table></figure></li>
+<li>no-undef: 정의되지 않은 변수 사용, 여기서는 err 변수<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">const err = undefined;</span><br><span class="line">const testFunc = (err, (next) =&gt; &#123;</span><br></pre></td></tr></table></figure></li>
+<li>func-names: 함수 표현식에 이름이 있어야함<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">const tempFunc = (err) =&gt; 1;</span><br><span class="line">or</span><br><span class="line">const tempFunc = <span class="keyword">function</span> <span class="built_in">test</span>(err) &#123;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>no-console 은 콘솔 사용금지인데, node.js 환경에서 디버그 용도로 확인해야하므로<br>turn off 설정해주자.<br>no-unused-vars: 함수안의 파라미터가 선언은 되었지만 사용은 하지 않음인데,<br>마찬가지로 rules 에 추가하여 turn off 로 제외시키자.</p>
+<p>“off” or 0 - 규칙 해제<br>“warn” or 1 - 규칙을 경고로 설정<br>“error” or 2 - 규칙을 오류로 설정</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"rules"</span>: &#123;</span><br><span class="line">    <span class="string">"no-unused-vars"</span>: 0,</span><br><span class="line">    <span class="string">"no-console"</span>: 0</span><br></pre></td></tr></table></figure>
+
+<p>최종 수정된 코드</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = require(<span class="string">'express'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> tempFunc = (err) =&gt; <span class="number">1</span>;</span><br><span class="line"><span class="keyword">const</span> err = undefined;</span><br><span class="line"><span class="keyword">const</span> testFunc = (err, (next) =&gt; &#123;</span><br><span class="line">    console.log(<span class="string">'err'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="–fix-옵션으로-수정"><a href="#–fix-옵션으로-수정" class="headerlink" title="–fix 옵션으로 수정"></a>–fix 옵션으로 수정</h3><p>–fix 옵션으로 자동 수정을 해보자.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ .\node_modules\.bin\eslint test.js --fix</span><br><span class="line">// 결과</span><br><span class="line">D:\<span class="built_in">test</span>\test.js</span><br><span class="line">  3:18  warning  Unexpected unnamed <span class="keyword">function</span>  func-names</span><br><span class="line">  7:19  error    <span class="string">'err'</span> is not defined         no-undef</span><br><span class="line">  7:24  warning  Unexpected unnamed <span class="keyword">function</span>  func-names</span><br></pre></td></tr></table></figure>
+
+<p>거의 대부분은 다 자동으로 잡아주지만,<br>func-names 는 warning 으로, no-undef 는 error 로 출력이 되었다.</p>
+<p>공식 도큐먼트에는 func-names 는 디버깅에 도움이 되도록 함수 표현식 이름을<br>지정하라고 나와있다.<br>함수 이름을 생략하면 함수에서 예외 발생 시, 스택에서 (anonymous function) 으로 표시된다.<br>따라서 이름을 주던지, arrow function 으로 바꾸면 해결 할 수 있다.<br>no-undef 는 변수 선언 시, 항상 const 혹은 let을 사용하라고 나와있다.</p>
+<p>최종 수정된 코드</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> express = require(<span class="string">'express'</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> tempFunc = (err) =&gt; <span class="number">1</span>;</span><br><span class="line"><span class="keyword">const</span> err = undefined;</span><br><span class="line"><span class="keyword">const</span> testFunc = (err, (next) =&gt; &#123;</span><br><span class="line">    console.log(<span class="string">'err'</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="rules-configuration"><a href="#rules-configuration" class="headerlink" title="rules configuration"></a>rules configuration</h3><p>거의 대부분은 airbnb 스타일에 따라 수정해가면 되지만, 그 외 조금 불필요한 옵션들이나<br>설정해야하는 옵션들은 turn off 혹은 error 처리로 정의했다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"rules"</span>: &#123;</span><br><span class="line">    <span class="string">"semi"</span>: [</span><br><span class="line">            <span class="string">"error"</span>,</span><br><span class="line">            <span class="string">"always"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"indent"</span>: [</span><br><span class="line">        <span class="string">"error"</span>,</span><br><span class="line">        4</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"no-unused-vars"</span>: 0,</span><br><span class="line">    <span class="string">"no-console"</span>: 0,</span><br><span class="line">    <span class="string">"keyword-spacing"</span>: 0,               // <span class="keyword">if</span>문 다음에 공백이 필요함.</span><br><span class="line">    <span class="string">"comma-dangle"</span>: [<span class="string">"error"</span>, <span class="string">"never"</span>], // 후행 쉼표 허용안함</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">태그</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/eslint/" rel="tag">eslint</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/30/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0(1)/" data-tooltip="node.js+express로 Game api 서버 만들기(1)" aria-label="다음: node.js+express로 Game api 서버 만들기(1)">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <script src="https://utteranc.es/client.js" repo="akanamed/blog-comments" issue-term="title" theme="github-light" crossorigin="anonymous" async>
+</script>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2019 akanamed. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2019/12/30/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0(1)/" data-tooltip="node.js+express로 Game api 서버 만들기(1)" aria-label="다음: node.js+express로 Game api 서버 만들기(1)">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/31/eslint-configuration-setting/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">akanamed</h4>
+        
+            <div id="about-card-bio"><p>Programmer</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Game Server</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Seoul, Korea
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-trez5ldsu0t3fur80vlze2cpomcosoojjg8hqabhrsmqpx0ixtpyhumwlvya.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+
+
+
+
+    </body>
+</html>

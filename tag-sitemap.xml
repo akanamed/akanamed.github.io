@@ -3,6 +3,13 @@
 
 
     <url>
+        <loc>https://akanamed.github.io/tags/eslint/</loc>
+        <lastmod>2019-12-31T06:06:20.369Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://akanamed.github.io/tags/apiserver/</loc>
         <lastmod>2019-12-30T06:31:21.642Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -54,13 +61,6 @@
     <url>
         <loc>https://akanamed.github.io/tags/mongodb/</loc>
         <lastmod>2019-12-26T09:53:30.555Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/tags/eslint/</loc>
-        <lastmod>2019-12-26T09:45:27.155Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
