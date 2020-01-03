@@ -177,6 +177,94 @@
     <section class="postShorten-group main-content-wrap">
     
     
+    <article class="postShorten postShorten--thumbnailimg-bottom">
+        <div class="postShorten-wrap">
+            
+            <div class="postShorten-header">
+                <h1 class="postShorten-title">
+                    
+                        <a class="link-unstyled" href="/2020/01/03/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-2/" aria-label=": node.js+express로 Game api 서버 만들기(2)">
+                            node.js+express로 Game api 서버 만들기(2)
+                        </a>
+                    
+                </h1>
+                <div class="postShorten-meta">
+    <time datetime="2020-01-03T12:00:33+09:00">
+	
+		    2020/01/03 12:00:33
+    	
+    </time>
+    
+        <span>카테고리 </span>
+        
+    <a class="category-link" href="/categories/nodejs/">nodejs</a>, <a class="category-link" href="/categories/nodejs/express/">express</a>
+
+
+    
+    <br>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-03T12:00:33+09:00">
+            
+                    2020/01/03 15:56:15
+                
+        </time>
+    
+</div>
+<!-- <div>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-03T12:00:33+09:00">
+            
+                    2020/01/03 15:56:15
+                
+        </time>
+    
+</div> -->
+            </div>
+            
+                <div class="postShorten-content">
+                    <a id="more"></a>
+
+<p><a href="https://akanamed.github.io/2019/12/30/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0(1)/">1편</a>에서<br>만들었던 기본 구조에 babel 을 설정해보자.<br>ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,<br>ES6+ 의 새로운 기능을 사용하기 위해 설치하자.</p>
+<h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Babel-Configuration"><span class="toc-text">Babel Configuration</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#install-babel-package"><span class="toc-text">install babel package</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#preset-설정"><span class="toc-text">preset 설정</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#nodemon-을-이용한-babel-node"><span class="toc-text">nodemon 을 이용한 babel-node</span></a></li></ol></li></ol>
+
+<h2 id="Babel-Configuration"><a href="#Babel-Configuration" class="headerlink" title="Babel Configuration"></a>Babel Configuration</h2><p><a href="https://babeljs.io/docs/en/usage" target="_blank" rel="external nofollow noopener noreferrer">바벨 가이드</a> 대로 설정하자.</p>
+<h3 id="install-babel-package"><a href="#install-babel-package" class="headerlink" title="install babel package"></a>install babel package</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -D @babel/core @babel/cli @babel/preset-env @babel/node</span><br></pre></td></tr></table></figure>
+<p>node 환경이므로 @babel/node도 추가해준다.<br>package.json 에 아래와 같이 추가되었다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"@babel/cli"</span>: <span class="string">"^7.7.7"</span>,</span><br><span class="line">    <span class="string">"@babel/core"</span>: <span class="string">"^7.7.7"</span>,</span><br><span class="line">    <span class="string">"@babel/node"</span>: <span class="string">"^7.7.7"</span>,</span><br><span class="line">    <span class="string">"@babel/preset-env"</span>: <span class="string">"^7.7.7"</span>,</span><br></pre></td></tr></table></figure>
+
+<h3 id="preset-설정"><a href="#preset-설정" class="headerlink" title="preset 설정"></a>preset 설정</h3><p>.babelrc 파일을 만들고 아래와 같이 정의해준다.<br>( 프로젝트의 root 에 파일을 만든다. )</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">"presets"</span>: [</span><br><span class="line">        [</span><br><span class="line">            <span class="string">"@babel/preset-env"</span>, &#123;</span><br><span class="line">                <span class="string">"targets"</span>: &#123;</span><br><span class="line">                    <span class="string">"node"</span>: <span class="string">"current"</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Node.js 에서 babel 을 실행하기 위해 package.json 을<br>아래와 같이 수정하고 서버를 실행해보자.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"start"</span>: <span class="string">"babel-node src/bin/www"</span></span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ npm start</span><br><span class="line">&gt; <span class="built_in">test</span>-api-server@0.0.0 start D:\<span class="built_in">test</span>-api-server</span><br><span class="line">&gt; babel-node src/bin/www</span><br><span class="line"></span><br><span class="line">Server Listening on 3000</span><br></pre></td></tr></table></figure>
+
+<h3 id="nodemon-을-이용한-babel-node"><a href="#nodemon-을-이용한-babel-node" class="headerlink" title="nodemon 을 이용한 babel-node"></a>nodemon 을 이용한 babel-node</h3><p>개발환경에서는 코드 수정이 빈번하므로 nodemon을 이용한 babel-node 실행을 추가한다.<br>package.json</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"start"</span>: <span class="string">"nodemon src/bin/www --exec babel-node"</span></span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+
+<p>Done.</p>
+
+                    
+                        
+
+
+                    
+                    
+                        <p>
+                            <a href="/2020/01/03/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-2/#post-footer" class="postShorten-excerpt_link link" aria-label>
+                                댓글 공유
+                            </a>
+                        </p>
+                    
+                </div>
+            
+        </div>
+        
+    </article>
+    
+    
     <article class="postShorten postShorten--thumbnailimg-right">
         <div class="postShorten-wrap">
             
