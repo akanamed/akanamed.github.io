@@ -8,32 +8,48 @@
     </url>
 
     <url>
-        <loc>https://akanamed.github.io/2020/01/03/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-2/</loc>
-        <lastmod>2020-01-03T08:57:02.758Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/2019/12/30/node-js-express%EB%A1%9C-Game-api-%EC%84%9C%EB%B2%84-%EB%A7%8C%EB%93%A4%EA%B8%B0(1)/</loc>
-        <lastmod>2020-01-03T02:14:53.476Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://akanamed.github.io/2019/12/31/eslint-configuration-setting/</loc>
-        <lastmod>2019-12-31T06:06:20.369Z</lastmod>
+        <lastmod>2020-01-06T01:53:59.667Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
     </url>
 
     <url>
-        <loc>https://akanamed.github.io/2019/12/27/VSCode%EC%97%90%EC%84%9C-Node-js-%EB%94%94%EB%B2%84%EA%B9%85%ED%95%98%EA%B8%B0/</loc>
-        <lastmod>2019-12-27T08:08:32.506Z</lastmod>
+        <loc>https://akanamed.github.io/2019/12/26/Setting%20eslint%20in%20nodejs/</loc>
+        <lastmod>2020-01-06T01:52:44.993Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2019/12/20/Set%20Config%20MongoDB/</loc>
+        <lastmod>2020-01-06T01:52:35.713Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2019/12/27/Debugging%20Nodejs%20in%20VSCode/</loc>
+        <lastmod>2020-01-06T01:51:00.058Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2019/12/30/Create%20Game%20api%20server%20with%20node.js%20express-1/</loc>
+        <lastmod>2020-01-06T01:49:22.730Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/</loc>
+        <lastmod>2020-01-06T01:49:17.775Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -42,22 +58,6 @@
     <url>
         <loc>https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/</loc>
         <lastmod>2019-12-26T09:53:37.415Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/2019/12/20/mongoDB-config-%EC%84%B8%ED%8C%85/</loc>
-        <lastmod>2019-12-26T09:53:30.555Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/2019/12/26/node-js-%ED%99%98%EA%B2%BD%EC%97%90%EC%84%9C-eslint-%EC%84%A4%EC%A0%95%ED%95%98%EA%B8%B0/</loc>
-        <lastmod>2019-12-26T09:45:27.155Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
