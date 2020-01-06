@@ -1,0 +1,471 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="GameServerDevelop">
+    <title>Create Game api server with node.js express-3 - GameServerDevelop</title>
+    <meta name="author" content="akanamed">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"\n","dateCreated":"2020-01-06T11:28:18+09:00","dateModified":"2020-01-06T11:28:18+09:00","datePublished":"2020-01-06T11:28:18+09:00","description":"","headline":"Create Game api server with node.js express-3","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/"}</script>
+    <meta property="og:type" content="blog">
+<meta property="og:title" content="Create Game api server with node.js express-3">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;index.html">
+<meta property="og:site_name" content="GameServerDevelop">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2020-01-06T02:28:18.000Z">
+<meta property="article:modified_time" content="2020-01-06T02:28:18.824Z">
+<meta property="article:author" content="akanamed">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-vwaaiseervo0tukjf1ykkch1an7zafawceyrvpdkgar1zroez1rkqxu120gr.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154750067-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-154750067-1');
+    </script>
+
+
+    
+    <link rel="canonical" href="https://akanamed.github.io/2020/01/06/create-game-api-server-with-node-js-express-3/">
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/" aria-label>
+            GameServerDevelop
+        </a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about" aria-label="링크 열기: /#about">
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/" title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="카테고리">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">카테고리</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="태그">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">태그</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="아카이브">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">아카이브</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="검색">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">검색</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="external nofollow noopener noreferrer" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/rss2.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4" class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Create Game api server with node.js express-3
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-06T11:28:18+09:00">
+	
+		    2020/01/06 11:28:18
+    	
+    </time>
+    
+    <br>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-06T11:28:18+09:00">
+            
+                    2020/01/06 11:28:18
+                
+        </time>
+    
+</div>
+<!-- <div>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-06T11:28:18+09:00">
+            
+                    2020/01/06 11:28:18
+                
+        </time>
+    
+</div> -->
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <a id="more"></a>
+<h1 id="table-of-contents">목차</h1>
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/03/Create-Game-api-server-with-node.js-express-2/" data-tooltip="Create Game api server with node.js express-2" aria-label="다음: Create Game api server with node.js express-2">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <script src="https://utteranc.es/client.js" repo="akanamed/blog-comments" issue-term="title" theme="github-light" crossorigin="anonymous" async>
+</script>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 akanamed. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/03/Create-Game-api-server-with-node.js-express-2/" data-tooltip="Create Game api server with node.js express-2" aria-label="다음: Create Game api server with node.js express-2">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">akanamed</h4>
+        
+            <div id="about-card-bio"><p>Programmer</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Game Server</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Seoul, Korea
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-jhmvorfn4yzoudzvxxswsuxz7dtaisubpiwxbc3nj4cz4zsv7zhxzdievzvl.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+
+
+
+
+    </body>
+</html>

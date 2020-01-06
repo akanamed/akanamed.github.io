@@ -13,22 +13,22 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"1편에서만들었던 기본 구조에 babel 을 설정해보자.ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,ES6+ 의 새로운 기능을 사용하기 위해 설치하자.\n\n\n\nBabel Configuration바벨 가이드 대로 설정하자.\ninstall babel package1$ npm install -D @babel/core @babel/cli @babel/preset-env @babel/node\nnode 환경이므로 @babel/node도 추가해준다.package.json 에 아래와 같이 추가되었다.\n12345\"devDependencies\": &#123;    \"@babel/cli\": \"^7.7.7\",    \"@babel/core\": \"^7.7.7\",    \"@babel/node\": \"^7.7.7\",    \"@babel/preset-env\": \"^7.7.7\",\n\npreset 설정.babelrc 파일을 만들고 아래와 같이 정의해준다.( 프로젝트의 root 에 파일을 만든다. )\n1234567891011&#123;    \"presets\": [        [            \"@babel/preset-env\", &#123;                \"targets\": &#123;                    \"node\": \"current\"                &#125;            &#125;        ]    ]&#125;\nNode.js 에서 babel 을 실행하기 위해 package.json 을아래와 같이 수정하고 서버를 실행해보자.\n123\"scripts\": &#123;    \"start\": \"babel-node src/bin/www\"  &#125;,\n\n12345$ npm start&gt; test-api-server@0.0.0 start D:\\test-api-server&gt; babel-node src/bin/wwwServer Listening on 3000\n\nnodemon 을 이용한 babel-node개발환경에서는 코드 수정이 빈번하므로 nodemon을 이용한 babel-node 실행을 추가한다.package.json\n123\"scripts\": &#123;    \"start\": \"nodemon src/bin/www --exec babel-node\"  &#125;,\n\n그러면 express 에서 babel은?사실 이부분이 제일 중요할 것 같은데,express-generator 로 생성한 프로젝트는 기본 실행이 bin/www 에서 이루어진다.아래 app.js에서 29라인을 export default app; 으로 수정 후bin/www 에서 import App from “../app”; 으로 선언하게 되면,SyntaxError: Cannot use import statement outside a module 에러가 뜬다.\n\n\n즉, generator로 생성한 bin/www 는 단순히 서버 구동을 위한 코드이므로,app.js 파일을 가져와 http 객체와 연결시켜주는 동작밖에 없다.app.js에서의 export는 예외적으로 commonJS 문법으로 bin/www에 넘겨주어야 한다.\nexpress 에서 babel로 트랜스파일링1편에서 만들었던 폴더 구조에 app.js 도 src 폴더 아래에 옮겨주자.package.json 에 babel transfiling 을 추가한다.babel 로 src 폴더에 있는 *.js 파일들을 -w ( -watch와 동일: 파일 자동변경 감지) 옵션과-d 옵션으로 (–out-dir와 동일: target directory ) dist 폴더에 변환하겠다는 의미이다.\n123\"scripts\": &#123;    \"build\": \"babel src -w -d dist\"  &#125;,\n그리고 빌드를 하게 되면 dist 폴더가 생기면서 변환된 파일들이 생성된다.\n1$ npm run build\n\n최종 폴더구조\n\n\n\n변환된 파일 실행을 위한 마지막 구성.eslintignore 에 dist 폴더 이하는 검사기에서 제외하도록 아래와 같이 추가해준다.\n1dist/*\n\nexpress-generator 로 프로젝트를 생성하게 되면 src/bin/www 의 파일은 트랜스파일링이 되지 않는다.따라서 dist 폴더 아래에 bin/www 를 그대로 복사해서 옮겨놓자.그리고 babel 로 빌드한 dist/bin/www 를 실행해보자\n12$ C:\\GameApiServer&gt;node dist/bin/wwwServer Listening on 3000\n\nDone.\n","dateCreated":"2020-01-03T12:00:33+09:00","dateModified":"2020-01-06T10:49:17+09:00","datePublished":"2020-01-03T12:00:33+09:00","description":"1편에서만들었던 기본 구조에 babel 을 설정해보자.ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,ES6+ 의 새로운 기능을 사용하기 위해 설치하자.","headline":"Create Game api server with node.js express-2","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/","keywords":"express, apiserver"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"1편에서만들었던 기본 구조에 babel 을 설정해보자.ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,ES6+ 의 새로운 기능을 사용하기 위해 설치하자.\n\n\n\nBabel Configuration바벨 가이드 대로 설정하자.\ninstall babel package1$ npm install -D @babel/core @babel/cli @babel/preset-env @babel/node\nnode 환경이므로 @babel/node도 추가해준다.package.json 에 아래와 같이 추가되었다.\n12345\"devDependencies\": &#123;    \"@babel/cli\": \"^7.7.7\",    \"@babel/core\": \"^7.7.7\",    \"@babel/node\": \"^7.7.7\",    \"@babel/preset-env\": \"^7.7.7\",\n\npreset 설정.babelrc 파일을 만들고 아래와 같이 정의해준다.( 프로젝트의 root 에 파일을 만든다. )\n1234567891011&#123;    \"presets\": [        [            \"@babel/preset-env\", &#123;                \"targets\": &#123;                    \"node\": \"current\"                &#125;            &#125;        ]    ]&#125;\nNode.js 에서 babel 을 실행하기 위해 package.json 을아래와 같이 수정하고 서버를 실행해보자.\n123\"scripts\": &#123;    \"start\": \"babel-node src/bin/www\"  &#125;,\n\n12345$ npm start&gt; test-api-server@0.0.0 start D:\\test-api-server&gt; babel-node src/bin/wwwServer Listening on 3000\n\nnodemon 을 이용한 babel-node개발환경에서는 코드 수정이 빈번하므로 nodemon을 이용한 babel-node 실행을 추가한다.package.json\n123\"scripts\": &#123;    \"start\": \"nodemon src/bin/www --exec babel-node\"  &#125;,\n\n그러면 express 에서 babel은?사실 이부분이 제일 중요할 것 같은데,express-generator 로 생성한 프로젝트는 기본 실행이 bin/www 에서 이루어진다.아래 app.js에서 29라인을 export default app; 으로 수정 후bin/www 에서 import App from “../app”; 으로 선언하게 되면,SyntaxError: Cannot use import statement outside a module 에러가 뜬다.\n\n\n즉, generator로 생성한 bin/www 는 단순히 서버 구동을 위한 코드이므로,app.js 파일을 가져와 http 객체와 연결시켜주는 동작밖에 없다.app.js에서의 export는 예외적으로 commonJS 문법으로 bin/www에 넘겨주어야 한다.\nexpress 에서 babel로 트랜스파일링1편에서 만들었던 폴더 구조에 app.js 도 src 폴더 아래에 옮겨주자.package.json 에 babel transfiling 을 추가한다.babel 로 src 폴더에 있는 *.js 파일들을 -w ( -watch와 동일: 파일 자동변경 감지) 옵션과-d 옵션으로 (–out-dir와 동일: target directory ) dist 폴더에 변환하겠다는 의미이다.\n123\"scripts\": &#123;    \"build\": \"babel src -w -d dist\"  &#125;,\n그리고 빌드를 하게 되면 dist 폴더가 생기면서 변환된 파일들이 생성된다.\n1$ npm run build\n\n최종 폴더구조\n\n\n\n변환된 파일 실행을 위한 마지막 구성.eslintignore 에 dist 폴더 이하는 검사기에서 제외하도록 아래와 같이 추가해준다.\n1dist/*\n\nexpress-generator 로 프로젝트를 생성하게 되면 src/bin/www 의 파일은 트랜스파일링이 되지 않는다.따라서 dist 폴더 아래에 bin/www 를 그대로 복사해서 옮겨놓자.그리고 babel 로 빌드한 dist/bin/www 를 실행해보자\n12$ C:\\GameApiServer&gt;node dist/bin/wwwServer Listening on 3000\n\nDone.\n","dateCreated":"2020-01-03T12:00:33+09:00","dateModified":"2020-01-06T11:30:28+09:00","datePublished":"2020-01-03T12:00:33+09:00","description":"1편에서만들었던 기본 구조에 babel 을 설정해보자.ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,ES6+ 의 새로운 기능을 사용하기 위해 설치하자.","headline":"Create Game api server with node.js express-2","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/","keywords":"express, apiserver"}</script>
     <meta name="description" content="1편에서만들었던 기본 구조에 babel 을 설정해보자.ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,ES6+ 의 새로운 기능을 사용하기 위해 설치하자.">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Create Game api server with node.js express-2">
-<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;03&#x2F;Create%20Game%20api%20server%20with%20node.js%20express-2&#x2F;index.html">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;03&#x2F;Create-Game-api-server-with-node.js-express-2&#x2F;index.html">
 <meta property="og:site_name" content="GameServerDevelop">
 <meta property="og:description" content="1편에서만들었던 기본 구조에 babel 을 설정해보자.ES5 로만 코드를 작성한다면, babel은 필요없을 지 모르나,ES6+ 의 새로운 기능을 사용하기 위해 설치하자.">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;03&#x2F;Create%20Game%20api%20server%20with%20node.js%20express-2&#x2F;folder.PNG">
+<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;03&#x2F;Create-Game-api-server-with-node.js-express-2&#x2F;folder.PNG">
 <meta property="article:published_time" content="2020-01-03T03:00:33.000Z">
-<meta property="article:modified_time" content="2020-01-06T01:49:17.775Z">
+<meta property="article:modified_time" content="2020-01-06T02:30:28.148Z">
 <meta property="article:author" content="akanamed">
 <meta property="article:tag" content="express">
 <meta property="article:tag" content="apiserver">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;03&#x2F;Create%20Game%20api%20server%20with%20node.js%20express-2&#x2F;folder.PNG">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;03&#x2F;Create-Game-api-server-with-node.js-express-2&#x2F;folder.PNG">
     
     
         
@@ -54,7 +54,7 @@
 
 
     
-    <link rel="canonical" href="https://akanamed.github.io/2020/01/03/create game api server with node.js express-2/">
+    <link rel="canonical" href="https://akanamed.github.io/2020/01/03/create-game-api-server-with-node.js-express-2/">
     
         
     
@@ -210,7 +210,7 @@
         <span>LastUpdated  </span>
         <time datetime="2020-01-03T12:00:33+09:00">
             
-                    2020/01/06 10:49:17
+                    2020/01/06 11:30:28
                 
         </time>
     
@@ -220,7 +220,7 @@
         <span>LastUpdated  </span>
         <time datetime="2020-01-03T12:00:33+09:00">
             
-                    2020/01/06 10:49:17
+                    2020/01/06 11:30:28
                 
         </time>
     
@@ -260,7 +260,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm run build</span><br></pre></td></tr></table></figure>
 
 <p>최종 폴더구조</p>
-<img src="/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/folder.PNG" class title="This is an example image">
+<img src="/2020/01/03/Create-Game-api-server-with-node.js-express-2/folder.PNG" class title="This is an example image">
 
 
 <h4 id="변환된-파일-실행을-위한-마지막-구성"><a href="#변환된-파일-실행을-위한-마지막-구성" class="headerlink" title="변환된 파일 실행을 위한 마지막 구성"></a>변환된 파일 실행을 위한 마지막 구성</h4><p>.eslintignore 에 dist 폴더 이하는 검사기에서 제외하도록 아래와 같이 추가해준다.</p>
@@ -291,8 +291,9 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
-                        
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/06/Create-Game-api-server-with-node-js-express-3/" data-tooltip="Create Game api server with node.js express-3" aria-label="이전: Create Game api server with node.js express-3">
+                    
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">이전</span>
                     </a>
@@ -318,7 +319,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -326,7 +327,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -334,7 +335,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -379,8 +380,9 @@
         <ul class="post-actions post-action-nav">
             <li class="post-action">
                 
-                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
-                        
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/06/Create-Game-api-server-with-node-js-express-3/" data-tooltip="Create Game api server with node.js express-3" aria-label="이전: Create Game api server with node.js express-3">
+                    
                         <i class="fa fa-angle-left" aria-hidden="true"></i>
                         <span class="hide-xs hide-sm text-small icon-ml">이전</span>
                     </a>
@@ -406,7 +408,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -414,7 +416,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -422,7 +424,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -450,7 +452,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
                     </a>
                 </li>
@@ -458,7 +460,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
                     </a>
                 </li>
@@ -466,7 +468,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/03/Create%20Game%20api%20server%20with%20node.js%20express-2/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
                     </a>
                 </li>
