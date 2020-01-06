@@ -8,6 +8,38 @@
     </url>
 
     <url>
+        <loc>https://akanamed.github.io/2019/12/31/eslint-configuration-setting/</loc>
+        <lastmod>2020-01-06T02:37:20.604Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2019/12/30/Create-Game-api-server-with-node.js-express-1/</loc>
+        <lastmod>2020-01-06T02:36:40.782Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/</loc>
+        <lastmod>2020-01-06T02:35:57.063Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/</loc>
+        <lastmod>2020-01-06T02:35:06.131Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://akanamed.github.io/2019/12/20/Set-Config-MongoDB/</loc>
         <lastmod>2020-01-06T02:32:39.241Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -24,40 +56,8 @@
     </url>
 
     <url>
-        <loc>https://akanamed.github.io/2019/12/30/Create-Game-api-server-with-node.js-express-1/</loc>
-        <lastmod>2020-01-06T02:31:39.742Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/2020/01/03/Create-Game-api-server-with-node.js-express-2/</loc>
-        <lastmod>2020-01-06T02:30:28.148Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://akanamed.github.io/2019/12/26/Setting-eslint-in-nodejs/</loc>
         <lastmod>2020-01-06T02:29:49.705Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/</loc>
-        <lastmod>2020-01-06T02:28:18.824Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://akanamed.github.io/2019/12/31/eslint-configuration-setting/</loc>
-        <lastmod>2020-01-06T01:53:59.667Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
