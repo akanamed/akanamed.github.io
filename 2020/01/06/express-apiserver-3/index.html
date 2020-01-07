@@ -13,25 +13,25 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"router 를 분리하고 각 라우터에 대한 controller 를 만들자.\n\n\n\n기본라우팅라우팅은 URI 또는 경로 및 특정한 HTTP 요청 메소드인 특정 엔드포인트에 대한클라이언트 요청에 애플리케이션이 응답하는 방법을 결정하는 것을 말한다.\n라우트 정의에는 다음과 같은 구조가 필요하다.\n1app.METHOD(PATH, HANDLER)\nMETHOD는 get, post, put, delete의 HTTP 요청 메소드PATH는 서버에서의 경로HANDLER는 라우트가 일치할 때 실행되는 함수\n기본 라우팅 과 라우팅 에 자세하게 나와있다.\n그럼 왜 라우팅을 분리하는가보통 애플리케이션 레벨 미들웨어나 라우터 레벨 미들웨어로 요청 메소드를 구현하게 되는데,애플리케이션의 규모가 커지게 되면, 라우터의 분기가 많아지게 되고, 프로덕션 레벨에서유지보수 및 오류 발생 시 추적을 쉽게 하기 위해서다.\n라우터 레벨 미들웨어로 분리라우터 레벨 미들웨어로 분리해보자.\n제일 먼저 로그인 관련 요청을 만들어야 하므로, /auth 경로에 대한 라우터를 만들자.로그인 관련 모든 요청은 /auth 에서 시작한다고 가정한다.\n\napp.js에 라우터 미들웨어를 바인딩 한다.routes 폴더 자체를 import 하게 되면 폴더 내에서 index.js를 먼저 찾는다.\napp.js123import indexRouter from './routes';...app.use('/', indexRouter);\n\n따라서 index.js에 라우터 미들웨어를 만들자.아래는 /auth 경로에 대한 미들웨어 등록\nroutes/index.js12345678import express from 'express';import authRouter from './auth.route';const routeHandler = express.Router();routeHandler.use('/auth', authRouter);export default routeHandler;\n\npath별 요청에 따른 method들을 모듈화 해준다.\nroutes/auth.route.js123456789import express from 'express';import authController from '../controller/auth.controller';const authRouter = express.Router();authRouter.route('/create')    .post(authController.createUser);export default authRouter;\n\n/auth/create 로 요청이 들어오면 실행되는 핸들러를 별도 controller로 분리한다.\ncontroller/auth.controller.js1234567exports.createUser = (req, res, next) =&gt; &#123;    const &#123; userid &#125; = req.body;    const &#123; password &#125; = req.body;    return res.json(&#123;        message: 'success'    &#125;);&#125;;\n\n최종 변경 된 폴더 구조\n\n\n\n\n\npostman으로 라우터 미들웨어 테스트서버를 실행하자.\n1234567$ npm start[nodemon] 2.0.2[nodemon] to restart at any time, enter `rs`[nodemon] watching dir(s): *.*[nodemon] watching extensions: js,mjs,json[nodemon] starting `babel-node src/bin/www`Server Listening on 3000\n\n현재 서버에 추가한 http 경로는 /auth/create 밖에 없다.그 외는 404 error 를 리턴한다.\npostman으로 아래와 같이 send를 서버로 보내면,\n\n\n\nreq.body에 대한 예외처리는 되어 있지 않으므로,message:success 응답코드가 정상적으로 리턴됨을 알 수 있다.\n\n\n\n서버에서 요청 경로에 대한 로그\n1POST /auth/create 200 16.240 ms - 21\n\n그 외 다른 http path를 테스트 해보면, /auth/create/1 \n1234567891011Error: Sorry cant find that!    at D:\\test-api-server\\src/app.js:17:17    at Layer.handle [as handle_request] (D:\\test-api-server\\node_modules\\express\\lib\\router\\layer.js:95:5)    at trim_prefix (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:317:13)    at D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:284:7    at Function.process_params (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:335:12)    at Immediate.next (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:275:10)    at Immediate._onImmediate (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:635:15)    at processImmediate (internal/timers.js:441:21)    at process.topLevelDomainCallback (domain.js:130:23)POST /auth/create/1 404 16.541 ms - 21\n서버에서 해당 요청 경로에 대한 정의가 되어 있지 않으므로,에러스택을 콘솔로 찍으면서 404 에러를 리턴한다.\n번외 : babel 로 빌드 후 테스트12345$ npm run build&gt; test-api-server@0.0.0 build D:\\test-api-server&gt; babel src -w -d distSuccessfully compiled 4 files with Babel.\nbuild 된 파일들의 폴더 구조는 src와 같다.\n\n\n\n서버 실행 후, /auth/create로 요청을 보내면,\n123D:\\test-api-server&gt;node dist/bin/wwwServer Listening on 3000POST /auth/create 200 15.530 ms - 21\n\n잘 동작함을 알 수 있다.\n로그인 라우터 기능 구현아직 database 저장이나 session 을 이용한 로그인 / 로그아웃 기능은 없으므로,기본 구조만 만들어보자.\nroutes/auth.route.js 는 아래와 같이 작성한다.\n\n\ncontroller/auth.controller.js 는 아래와 같이 작성한다.\n\n\n/auth/login 으로 요청이 들어오면, UserInfo.userid 와 UserInfo.password로비교하여 로그인 성공/실패 redirect를 리턴한다.\n/auth/create는 아무런 동작을 하지 않는다. \n다음 포스팅은 express-session 과 mongoDB, passport를 이용해서 로그인을 마무리한다.\nDone.\n","dateCreated":"2020-01-06T11:28:18+09:00","dateModified":"2020-01-06T17:45:50+09:00","datePublished":"2020-01-06T11:28:18+09:00","description":"router 를 분리하고 각 라우터에 대한 controller 를 만들자.","headline":"Create Game api server with node.js express-3","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/","keywords":"express, apiserver"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"router 를 분리하고 각 라우터에 대한 controller 를 만들자.\n\n\n\n기본라우팅라우팅은 URI 또는 경로 및 특정한 HTTP 요청 메소드인 특정 엔드포인트에 대한클라이언트 요청에 애플리케이션이 응답하는 방법을 결정하는 것을 말한다.\n라우트 정의에는 다음과 같은 구조가 필요하다.\n1app.METHOD(PATH, HANDLER)\nMETHOD는 get, post, put, delete의 HTTP 요청 메소드PATH는 서버에서의 경로HANDLER는 라우트가 일치할 때 실행되는 함수\n기본 라우팅 과 라우팅 에 자세하게 나와있다.\n그럼 왜 라우팅을 분리하는가보통 애플리케이션 레벨 미들웨어나 라우터 레벨 미들웨어로 요청 메소드를 구현하게 되는데,애플리케이션의 규모가 커지게 되면, 라우터의 분기가 많아지게 되고, 프로덕션 레벨에서유지보수 및 오류 발생 시 추적을 쉽게 하기 위해서다.\n라우터 레벨 미들웨어로 분리라우터 레벨 미들웨어로 분리해보자.\n제일 먼저 로그인 관련 요청을 만들어야 하므로, /auth 경로에 대한 라우터를 만들자.로그인 관련 모든 요청은 /auth 에서 시작한다고 가정한다.\n\napp.js에 라우터 미들웨어를 바인딩 한다.routes 폴더 자체를 import 하게 되면 폴더 내에서 index.js를 먼저 찾는다.\napp.js123import indexRouter from './routes';...app.use('/', indexRouter);\n\n따라서 index.js에 라우터 미들웨어를 만들자.아래는 /auth 경로에 대한 미들웨어 등록\nroutes/index.js12345678import express from 'express';import authRouter from './auth.route';const routeHandler = express.Router();routeHandler.use('/auth', authRouter);export default routeHandler;\n\npath별 요청에 따른 method들을 모듈화 해준다.\nroutes/auth.route.js123456789import express from 'express';import authController from '../controller/auth.controller';const authRouter = express.Router();authRouter.route('/create')    .post(authController.createUser);export default authRouter;\n\n/auth/create 로 요청이 들어오면 실행되는 핸들러를 별도 controller로 분리한다.\ncontroller/auth.controller.js1234567exports.createUser = (req, res, next) =&gt; &#123;    const &#123; userid &#125; = req.body;    const &#123; password &#125; = req.body;    return res.json(&#123;        message: 'success'    &#125;);&#125;;\n\n최종 변경 된 폴더 구조\n\n\n\n\n\npostman으로 라우터 미들웨어 테스트서버를 실행하자.\n1234567$ npm start[nodemon] 2.0.2[nodemon] to restart at any time, enter `rs`[nodemon] watching dir(s): *.*[nodemon] watching extensions: js,mjs,json[nodemon] starting `babel-node src/bin/www`Server Listening on 3000\n\n현재 서버에 추가한 http 경로는 /auth/create 밖에 없다.그 외는 404 error 를 리턴한다.\npostman으로 아래와 같이 send를 서버로 보내면,\n\n\n\nreq.body에 대한 예외처리는 되어 있지 않으므로,message:success 응답코드가 정상적으로 리턴됨을 알 수 있다.\n\n\n\n서버에서 요청 경로에 대한 로그\n1POST /auth/create 200 16.240 ms - 21\n\n그 외 다른 http path를 테스트 해보면, /auth/create/1 \n1234567891011Error: Sorry cant find that!    at D:\\test-api-server\\src/app.js:17:17    at Layer.handle [as handle_request] (D:\\test-api-server\\node_modules\\express\\lib\\router\\layer.js:95:5)    at trim_prefix (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:317:13)    at D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:284:7    at Function.process_params (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:335:12)    at Immediate.next (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:275:10)    at Immediate._onImmediate (D:\\test-api-server\\node_modules\\express\\lib\\router\\index.js:635:15)    at processImmediate (internal/timers.js:441:21)    at process.topLevelDomainCallback (domain.js:130:23)POST /auth/create/1 404 16.541 ms - 21\n서버에서 해당 요청 경로에 대한 정의가 되어 있지 않으므로,에러스택을 콘솔로 찍으면서 404 에러를 리턴한다.\n번외 : babel 로 빌드 후 테스트12345$ npm run build&gt; test-api-server@0.0.0 build D:\\test-api-server&gt; babel src -w -d distSuccessfully compiled 4 files with Babel.\nbuild 된 파일들의 폴더 구조는 src와 같다.\n\n\n\n서버 실행 후, /auth/create로 요청을 보내면,\n123D:\\test-api-server&gt;node dist/bin/wwwServer Listening on 3000POST /auth/create 200 15.530 ms - 21\n\n잘 동작함을 알 수 있다.\n로그인 라우터 기능 구현아직 database 저장이나 session 을 이용한 로그인 / 로그아웃 기능은 없으므로,기본 구조만 만들어보자.\nroutes/auth.route.js 는 아래와 같이 작성한다.\n\n\ncontroller/auth.controller.js 는 아래와 같이 작성한다.\n\n\n/auth/login 으로 요청이 들어오면, UserInfo.userid 와 UserInfo.password로비교하여 로그인 성공/실패 redirect를 리턴한다.\n/auth/create는 아무런 동작을 하지 않는다. \n다음 포스팅은 express-session 과 mongoDB, passport를 이용해서 로그인을 마무리한다.\nDone.\n","dateCreated":"2020-01-06T11:28:18+09:00","dateModified":"2020-01-07T15:46:56+09:00","datePublished":"2020-01-06T11:28:18+09:00","description":"router 를 분리하고 각 라우터에 대한 controller 를 만들자.","headline":"Create Game api server with node.js express-3","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/06/express-apiserver-3/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/06/express-apiserver-3/","keywords":"express, apiserver"}</script>
     <meta name="description" content="router 를 분리하고 각 라우터에 대한 controller 를 만들자.">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="Create Game api server with node.js express-3">
-<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;index.html">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;express-apiserver-3&#x2F;index.html">
 <meta property="og:site_name" content="GameServerDevelop">
 <meta property="og:description" content="router 를 분리하고 각 라우터에 대한 controller 를 만들자.">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;routing.PNG">
-<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;post.PNG">
-<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;post2.PNG">
-<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;babel.PNG">
+<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;express-apiserver-3&#x2F;routing.PNG">
+<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;express-apiserver-3&#x2F;post.PNG">
+<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;express-apiserver-3&#x2F;post2.PNG">
+<meta property="og:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;express-apiserver-3&#x2F;babel.PNG">
 <meta property="article:published_time" content="2020-01-06T02:28:18.000Z">
-<meta property="article:modified_time" content="2020-01-06T08:45:50.649Z">
+<meta property="article:modified_time" content="2020-01-07T06:46:56.088Z">
 <meta property="article:author" content="akanamed">
 <meta property="article:tag" content="express">
 <meta property="article:tag" content="apiserver">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;Create-Game-api-server-with-node-js-express-3&#x2F;routing.PNG">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;06&#x2F;express-apiserver-3&#x2F;routing.PNG">
     
     
         
@@ -57,7 +57,7 @@
 
 
     
-    <link rel="canonical" href="https://akanamed.github.io/2020/01/06/create-game-api-server-with-node-js-express-3/">
+    <link rel="canonical" href="https://akanamed.github.io/2020/01/06/express-apiserver-3/">
     
         
     
@@ -213,7 +213,7 @@
         <span>LastUpdated  </span>
         <time datetime="2020-01-06T11:28:18+09:00">
             
-                    2020/01/06 17:45:50
+                    2020/01/07 15:46:56
                 
         </time>
     
@@ -223,7 +223,7 @@
         <span>LastUpdated  </span>
         <time datetime="2020-01-06T11:28:18+09:00">
             
-                    2020/01/06 17:45:50
+                    2020/01/07 15:46:56
                 
         </time>
     
@@ -260,7 +260,7 @@
 <figure class="highlight objc"><figcaption><span>controller/auth.controller.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">exports.createUser = (req, res, next) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; userid &#125; = req.body;</span><br><span class="line">    <span class="keyword">const</span> &#123; password &#125; = req.body;</span><br><span class="line">    <span class="keyword">return</span> res.json(&#123;</span><br><span class="line">        message: <span class="string">'success'</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>최종 변경 된 폴더 구조</p>
-<img src="/2020/01/06/Create-Game-api-server-with-node-js-express-3/routing.PNG" class title="This is an example image">
+<img src="/2020/01/06/express-apiserver-3/routing.PNG" class title="This is an example image">
 
 
 </li>
@@ -270,11 +270,11 @@
 
 <p>현재 서버에 추가한 http 경로는 /auth/create 밖에 없다.<br>그 외는 404 error 를 리턴한다.</p>
 <p>postman으로 아래와 같이 send를 서버로 보내면,</p>
-<img src="/2020/01/06/Create-Game-api-server-with-node-js-express-3/post.PNG" class title="This is an example image">
+<img src="/2020/01/06/express-apiserver-3/post.PNG" class title="This is an example image">
 
 
 <p>req.body에 대한 예외처리는 되어 있지 않으므로,<br>message:success 응답코드가 정상적으로 리턴됨을 알 수 있다.</p>
-<img src="/2020/01/06/Create-Game-api-server-with-node-js-express-3/post2.PNG" class title="This is an example image">
+<img src="/2020/01/06/express-apiserver-3/post2.PNG" class title="This is an example image">
 
 
 <p>서버에서 요청 경로에 대한 로그</p>
@@ -285,7 +285,7 @@
 <p>서버에서 해당 요청 경로에 대한 정의가 되어 있지 않으므로,<br>에러스택을 콘솔로 찍으면서 404 에러를 리턴한다.</p>
 <h3 id="번외-babel-로-빌드-후-테스트"><a href="#번외-babel-로-빌드-후-테스트" class="headerlink" title="번외 : babel 로 빌드 후 테스트"></a>번외 : babel 로 빌드 후 테스트</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ npm run build</span><br><span class="line">&gt; <span class="built_in">test</span>-api-server@0.0.0 build D:\<span class="built_in">test</span>-api-server</span><br><span class="line">&gt; babel src -w -d dist</span><br><span class="line"></span><br><span class="line">Successfully compiled 4 files with Babel.</span><br></pre></td></tr></table></figure>
 <p>build 된 파일들의 폴더 구조는 src와 같다.</p>
-<img src="/2020/01/06/Create-Game-api-server-with-node-js-express-3/babel.PNG" class title="This is an example image">
+<img src="/2020/01/06/express-apiserver-3/babel.PNG" class title="This is an example image">
 
 
 <p>서버 실행 후, /auth/create로 요청을 보내면,</p>
@@ -334,7 +334,7 @@
             <li class="post-action">
                 
                     
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/03/Create-Game-api-server-with-node.js-express-2/" data-tooltip="Create Game api server with node.js express-2" aria-label="다음: Create Game api server with node.js express-2">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/03/express-apiserver-2/" data-tooltip="Create Game api server with node.js express-2" aria-label="다음: Create Game api server with node.js express-2">
                     
                         <span class="hide-xs hide-sm text-small icon-mr">다음</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -352,7 +352,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/express-apiserver-3/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -360,7 +360,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/express-apiserver-3/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -368,7 +368,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/express-apiserver-3/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -423,7 +423,7 @@
             <li class="post-action">
                 
                     
-                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/03/Create-Game-api-server-with-node.js-express-2/" data-tooltip="Create Game api server with node.js express-2" aria-label="다음: Create Game api server with node.js express-2">
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/03/express-apiserver-2/" data-tooltip="Create Game api server with node.js express-2" aria-label="다음: Create Game api server with node.js express-2">
                     
                         <span class="hide-xs hide-sm text-small icon-mr">다음</span>
                         <i class="fa fa-angle-right" aria-hidden="true"></i>
@@ -441,7 +441,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/express-apiserver-3/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -449,7 +449,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/express-apiserver-3/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -457,7 +457,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/express-apiserver-3/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -485,7 +485,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/06/express-apiserver-3/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
                     </a>
                 </li>
@@ -493,7 +493,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/06/express-apiserver-3/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
                     </a>
                 </li>
@@ -501,7 +501,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/Create-Game-api-server-with-node-js-express-3/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/06/express-apiserver-3/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
                     </a>
                 </li>

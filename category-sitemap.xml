@@ -8,22 +8,22 @@
     </url>
 
     <url>
-        <loc>https://akanamed.github.io/categories/hexo/</loc>
-        <lastmod>2020-01-07T06:43:37.199Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://akanamed.github.io/categories/nodejs/express/</loc>
-        <lastmod>2020-01-07T06:35:48.593Z</lastmod>
+        <lastmod>2020-01-07T06:46:56.088Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://akanamed.github.io/categories/nodejs/</loc>
-        <lastmod>2020-01-07T06:35:48.593Z</lastmod>
+        <lastmod>2020-01-07T06:46:56.088Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/categories/hexo/</loc>
+        <lastmod>2020-01-07T06:43:37.199Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
