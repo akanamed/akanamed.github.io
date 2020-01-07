@@ -13,16 +13,16 @@
     
         <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
     
-    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"얼마전 부터 뭔가 정리를 하나씩 해야겠다는 생각에 github 블로그를 만들어보고자 했다.결론부터 얘기하면 쉽지 않았다.\n\n\n\ngithub 블로그는 거의 대부분 jekyll 테마를 적용하는 듯 해서 시도를 해보았지만,ruby 설치부터 적용까지가 쉽지 않았다. ( 결과적으로는 실패했다. )그러던 중에 hexo 테마를 검색하게 되었고, nodejs 기반이라 익숙하기도 했으며,조금 난관에 부딪히기도 했지만 성공적으로 만들게 되었다.\n아래는 hexo tranquilpeak 테마 적용에 대해 도움을 많이 받은 사이트hexo tranquilpeak 테마 환경 설정Github 블로그 만들기 with Hexo\n정말 위 사이트로 들어가서 따라하면 금방 만들어진다.\n하지만 지금 이 블로그의 tranquilpeak 테마 버전의 최신 release는 3.1.1 이며,내가 수정한 것에 대한 삽질기를 기록으로 남긴다.\ntitle 클릭 시 깨짐 문제12$ hexo s$ http://localhost:4000/\n로컬 실행모드로 블로그가 제대로 동작하는걸 확인했으나, 한가지 문제가 있었다.포스트 상단의 header 를 클릭하면, home 이 동작해야 하는데 %20 관련 GET 에러가 뜬다.\n위 에러 관련 수정은 아래와 같다.\nthemes/tranquilpeak/layout/header.ejs1234567891011&lt;div class&#x3D;&quot;header-title&quot;&gt;    &lt;a        class&#x3D;&quot;header-title-link&quot;        href&#x3D;&quot;&lt;%- url_for(&#39;&#39;) %&gt;&quot;        aria-label&#x3D;&quot;&lt;% __(&#39;global.go_to_homepage&#39;) %&gt;&quot;    &gt;        &lt;%&#x3D; config.title %&gt;    &lt;&#x2F;a&gt;&lt;&#x2F;div&gt;\n\n위 href 의 url_for(‘%20’) 부분을 url_for(‘’) 로 변경하면 된다.\nutterances 댓글 기능 추가기본적으로 tranquilpeak 테마에는 utterances 기능이 없는 듯 하여, 추가하였다.\n아래는 utterances 설정에 대한 참조사이트hexo utterances 댓글 추가\n이제 tranquilpeak 테마에 적용하기 위한 작업은 아래와 같다.\nutterances.ejs 파일 생성위 링크대로 진행하게 되면 최종 script가 생성되는데 , Copy 버튼을 눌러 복사한 후themes/tranquilpeak/layout/_partial/post 폴더 아래에 utternaces.ejs 파일을 하나 생성한 다음복사한 script를 붙여넣고 저장한다.\nthemes/tranquilpeak/layout/_partial/post/utterances.ejs123456789&lt;script src&#x3D;&quot;https:&#x2F;&#x2F;utteranc.es&#x2F;client.js&quot;        repo&#x3D;&quot;&#123;userid&#125;&#x2F;blog-comments&quot;        issue-term&#x3D;&quot;title&quot;        theme&#x3D;&quot;github-light&quot;        crossorigin&#x3D;&quot;anonymous&quot;        async&gt;&lt;&#x2F;script&gt;\n\n위 repo의 {userid}는 본인의 github의 사용자 계정명이다.\n_config.yml 에 utterances enable:true 설정아래 comment systems 주석을 찾아서 utterances 항목처럼 추가\nthemes/tranquilpeak/_config.yml1234567# ---------------# Comment systems# ---------------...utterances:    enable: true...\n\npost.ejs 변경아래 post.comments 를 찾아 else if 구문처럼 추가\nthemes/tranquilpeak/layout/_partial/post.ejs12345678910&lt;article class&#x3D;&quot;post&quot;&gt;    ...    &lt;% if (post.comments) &#123; %&gt;        ...        &lt;% &#125; else if (theme.utterances.enable) &#123; %&gt;            &lt;%- partial(&#39;post&#x2F;utterances&#39;) %&gt;        &lt;% &#125; %&gt;    &lt;% &#125; %&gt;...\n\nLastUpdated 기능 추가아래 front matter - post.md 는 hexo new ‘title’ 로 생성할 때마다 아래 양식에 맞춰 생성되게끔커스터마이징한 것이며, lastUpdated 기능 추가를 위해 updated 를 아래처럼 추가.\nscaffolds/post.md123456789---title: hexo tranquilpeak 테마 적용 삽질기date: 1577068258000updated:categories:tags:---&lt;!-- more --&gt;&lt;!-- toc --&gt;\n\n그럼 이제 themes/tranquilpeak 에서 몇군데에 코드를 수정해줘야한다.ko.yml 에 date_format 아래에 updated_format 을 추가.\nthemes/tranquilpeak/languages/ko.yml1234date_format: &quot;YYYY&#x2F;MM&#x2F;DD HH:mm:ss&quot;updated_format: &quot;YYYY&#x2F;MM&#x2F;DD HH:mm:ss&quot;\n\n아래 경로대로 찾아가서 meta.ejs 에 아래 코드를 추가.post.md에서 추가했던 updated 를 표시하기 위한 코드.\nthemes/tranquilpeak/layout/_partial/post/meta.ejs1234567891011&lt;br&gt;&lt;% if (post.updated) &#123; %&gt;    &lt;span&gt;&lt;%= 'LastUpdated '  %&gt; &lt;/span&gt;    &lt;time datetime=\"&lt;%= post.date.format() %&gt;\"&gt;        &lt;% if (post.lang) &#123; %&gt;                &lt;%= post.updated.locale(post.lang).format(__('updated_format')) %&gt;            &lt;% &#125; else &#123; %&gt;                &lt;%= post.updated.locale(page.lang).format(__('updated_format')) %&gt;            &lt;% &#125; %&gt;    &lt;/time&gt;&lt;% &#125; %&gt;\n\n_config.yml 에 use_date_for_updated  항목이 false 로 되어 있는지 확인.true로 되어있다면, false 로 바꿔준다.\ntrue로 설정하게 되면, updated 가 포스트 생성 날짜로 사용한다는 의미주의 : _config.yml 은 테마폴더 안의 파일이 아니고 프로젝트의 파일\n\n\n로컬에서 최종 적용 확인 및 deploy123$ hexo s$ hexo g$ hexo d\n\nDone.\n","dateCreated":"2019-12-23T11:30:58+09:00","dateModified":"2019-12-26T18:53:37+09:00","datePublished":"2019-12-23T11:30:58+09:00","description":"얼마전 부터 뭔가 정리를 하나씩 해야겠다는 생각에 github 블로그를 만들어보고자 했다.결론부터 얘기하면 쉽지 않았다.","headline":"hexo tranquilpeak 테마 적용 삽질기","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/","keywords":"hexo, tranquilpeak"}</script>
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"얼마전 부터 뭔가 정리를 하나씩 해야겠다는 생각에 github 블로그를 만들어보고자 했다.결론부터 얘기하면 쉽지 않았다.\n\n\n\ngithub 블로그는 거의 대부분 jekyll 테마를 적용하는 듯 해서 시도를 해보았지만,ruby 설치부터 적용까지가 쉽지 않았다. ( 결과적으로는 실패했다. )그러던 중에 hexo 테마를 검색하게 되었고, nodejs 기반이라 익숙하기도 했으며,조금 난관에 부딪히기도 했지만 성공적으로 만들게 되었다.\n아래는 hexo tranquilpeak 테마 적용에 대해 도움을 많이 받은 사이트hexo tranquilpeak 테마 환경 설정Github 블로그 만들기 with Hexo\n정말 위 사이트로 들어가서 따라하면 금방 만들어진다.\n하지만 지금 이 블로그의 tranquilpeak 테마 버전의 최신 release는 3.1.1 이며,내가 수정한 것에 대한 삽질기를 기록으로 남긴다.\ntitle 클릭 시 깨짐 문제12$ hexo s$ http://localhost:4000/\n로컬 실행모드로 블로그가 제대로 동작하는걸 확인했으나, 한가지 문제가 있었다.포스트 상단의 header 를 클릭하면, home 이 동작해야 하는데 %20 관련 GET 에러가 뜬다.\n위 에러 관련 수정은 아래와 같다.\nthemes/tranquilpeak/layout/header.ejs1234567891011&lt;div class&#x3D;&quot;header-title&quot;&gt;    &lt;a        class&#x3D;&quot;header-title-link&quot;        href&#x3D;&quot;&lt;%- url_for(&#39;&#39;) %&gt;&quot;        aria-label&#x3D;&quot;&lt;% __(&#39;global.go_to_homepage&#39;) %&gt;&quot;    &gt;        &lt;%&#x3D; config.title %&gt;    &lt;&#x2F;a&gt;&lt;&#x2F;div&gt;\n\n위 href 의 url_for(‘%20’) 부분을 url_for(‘’) 로 변경하면 된다.\nutterances 댓글 기능 추가기본적으로 tranquilpeak 테마에는 utterances 기능이 없는 듯 하여, 추가하였다.\n아래는 utterances 설정에 대한 참조사이트hexo utterances 댓글 추가\n이제 tranquilpeak 테마에 적용하기 위한 작업은 아래와 같다.\nutterances.ejs 파일 생성위 링크대로 진행하게 되면 최종 script가 생성되는데 , Copy 버튼을 눌러 복사한 후themes/tranquilpeak/layout/_partial/post 폴더 아래에 utternaces.ejs 파일을 하나 생성한 다음복사한 script를 붙여넣고 저장한다.\nthemes/tranquilpeak/layout/_partial/post/utterances.ejs123456789&lt;script src&#x3D;&quot;https:&#x2F;&#x2F;utteranc.es&#x2F;client.js&quot;        repo&#x3D;&quot;&#123;userid&#125;&#x2F;blog-comments&quot;        issue-term&#x3D;&quot;title&quot;        theme&#x3D;&quot;github-light&quot;        crossorigin&#x3D;&quot;anonymous&quot;        async&gt;&lt;&#x2F;script&gt;\n\n위 repo의 {userid}는 본인의 github의 사용자 계정명이다.\n_config.yml 에 utterances enable:true 설정아래 comment systems 주석을 찾아서 utterances 항목처럼 추가\nthemes/tranquilpeak/_config.yml1234567# ---------------# Comment systems# ---------------...utterances:    enable: true...\n\npost.ejs 변경아래 post.comments 를 찾아 else if 구문처럼 추가\nthemes/tranquilpeak/layout/_partial/post.ejs12345678910&lt;article class&#x3D;&quot;post&quot;&gt;    ...    &lt;% if (post.comments) &#123; %&gt;        ...        &lt;% &#125; else if (theme.utterances.enable) &#123; %&gt;            &lt;%- partial(&#39;post&#x2F;utterances&#39;) %&gt;        &lt;% &#125; %&gt;    &lt;% &#125; %&gt;...\n\nLastUpdated 기능 추가아래 front matter - post.md 는 hexo new ‘title’ 로 생성할 때마다 아래 양식에 맞춰 생성되게끔커스터마이징한 것이며, lastUpdated 기능 추가를 위해 updated 를 아래처럼 추가.\nscaffolds/post.md123456789---title: hexo tranquilpeak 테마 적용 삽질기date: 1577068258000updated:categories:tags:---&lt;!-- more --&gt;&lt;!-- toc --&gt;\n\n그럼 이제 themes/tranquilpeak 에서 몇군데에 코드를 수정해줘야한다.ko.yml 에 date_format 아래에 updated_format 을 추가.\nthemes/tranquilpeak/languages/ko.yml1234date_format: &quot;YYYY&#x2F;MM&#x2F;DD HH:mm:ss&quot;updated_format: &quot;YYYY&#x2F;MM&#x2F;DD HH:mm:ss&quot;\n\n아래 경로대로 찾아가서 meta.ejs 에 아래 코드를 추가.post.md에서 추가했던 updated 를 표시하기 위한 코드.\nthemes/tranquilpeak/layout/_partial/post/meta.ejs1234567891011&lt;br&gt;&lt;% if (post.updated) &#123; %&gt;    &lt;span&gt;&lt;%= 'LastUpdated '  %&gt; &lt;/span&gt;    &lt;time datetime=\"&lt;%= post.date.format() %&gt;\"&gt;        &lt;% if (post.lang) &#123; %&gt;                &lt;%= post.updated.locale(post.lang).format(__('updated_format')) %&gt;            &lt;% &#125; else &#123; %&gt;                &lt;%= post.updated.locale(page.lang).format(__('updated_format')) %&gt;            &lt;% &#125; %&gt;    &lt;/time&gt;&lt;% &#125; %&gt;\n\n_config.yml 에 use_date_for_updated  항목이 false 로 되어 있는지 확인.true로 되어있다면, false 로 바꿔준다.\ntrue로 설정하게 되면, updated 가 포스트 생성 날짜로 사용한다는 의미주의 : _config.yml 은 테마폴더 안의 파일이 아니고 프로젝트의 파일\n\n\n로컬에서 최종 적용 확인 및 deploy123$ hexo s$ hexo g$ hexo d\n\nDone.\n","dateCreated":"2019-12-23T11:30:58+09:00","dateModified":"2020-01-07T15:43:37+09:00","datePublished":"2019-12-23T11:30:58+09:00","description":"얼마전 부터 뭔가 정리를 하나씩 해야겠다는 생각에 github 블로그를 만들어보고자 했다.결론부터 얘기하면 쉽지 않았다.","headline":"hexo tranquilpeak 테마 적용 삽질기","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/","keywords":"hexo, tranquilpeak"}</script>
     <meta name="description" content="얼마전 부터 뭔가 정리를 하나씩 해야겠다는 생각에 github 블로그를 만들어보고자 했다.결론부터 얘기하면 쉽지 않았다.">
 <meta property="og:type" content="blog">
 <meta property="og:title" content="hexo tranquilpeak 테마 적용 삽질기">
-<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2019&#x2F;12&#x2F;23&#x2F;hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0&#x2F;index.html">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2019&#x2F;12&#x2F;23&#x2F;hexo-tranquilpeak-themes&#x2F;index.html">
 <meta property="og:site_name" content="GameServerDevelop">
 <meta property="og:description" content="얼마전 부터 뭔가 정리를 하나씩 해야겠다는 생각에 github 블로그를 만들어보고자 했다.결론부터 얘기하면 쉽지 않았다.">
 <meta property="og:locale" content="ko_KR">
 <meta property="article:published_time" content="2019-12-23T02:30:58.000Z">
-<meta property="article:modified_time" content="2019-12-26T09:53:37.415Z">
+<meta property="article:modified_time" content="2020-01-07T06:43:37.199Z">
 <meta property="article:author" content="akanamed">
 <meta property="article:tag" content="hexo">
 <meta property="article:tag" content="tranquilpeak">
@@ -52,7 +52,7 @@
 
 
     
-    <link rel="canonical" href="https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-테마-적용-삽질기/">
+    <link rel="canonical" href="https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/">
     
         
     
@@ -208,7 +208,7 @@
         <span>LastUpdated  </span>
         <time datetime="2019-12-23T11:30:58+09:00">
             
-                    2019/12/26 18:53:37
+                    2020/01/07 15:43:37
                 
         </time>
     
@@ -218,7 +218,7 @@
         <span>LastUpdated  </span>
         <time datetime="2019-12-23T11:30:58+09:00">
             
-                    2019/12/26 18:53:37
+                    2020/01/07 15:43:37
                 
         </time>
     
@@ -321,7 +321,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -329,7 +329,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -337,7 +337,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -410,7 +410,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-facebook" aria-hidden="true"></i>
                 </a>
             </li>
@@ -418,7 +418,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-twitter" aria-hidden="true"></i>
                 </a>
             </li>
@@ -426,7 +426,7 @@
             
             
             <li class="post-action hide-xs">
-                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                     <i class="fab fa-google-plus" aria-hidden="true"></i>
                 </a>
             </li>
@@ -454,7 +454,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
                     </a>
                 </li>
@@ -462,7 +462,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
                     </a>
                 </li>
@@ -470,7 +470,7 @@
                 
                 
                 <li class="share-option">
-                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-%ED%85%8C%EB%A7%88-%EC%A0%81%EC%9A%A9-%EC%82%BD%EC%A7%88%EA%B8%B0/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2019/12/23/hexo-tranquilpeak-themes/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
                         <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
                     </a>
                 </li>
