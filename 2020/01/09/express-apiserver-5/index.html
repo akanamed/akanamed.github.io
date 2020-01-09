@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="GameServerDevelop">
+    <title>Create Game api server with node.js express-5 - GameServerDevelop</title>
+    <meta name="author" content="akanamed">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"지금까지 만든 프로젝트에 서버 및 DB 접속 정보나 포트가 하드코딩되어있다.dotenv 패키지를 이용해 환경변수 파일을 만들고 관리한다.\n\n\n\nNode.js processNode.js의 process 객체는 global이다.즉, require() 를 사용하지 않고, 접근할 수 있으며, 현재 프로세스에 대한 정보와 제어를할 수 있다.\nprocess 객체 중 이번 포스팅에서 다루는 건 env 환경 변수인데, dotenv 패키지를 이용해프로젝트에서 사용할 환경 변수들의 정보를 .env 파일에 모아서 관리한다.\ndotenv 설치dotenv 패키지를 설치한다.\n1$ npm i dotenv --save\ncreate .env file현재 프로젝트에서 관리할 정보들을 환경변수로 등록하기 위해 프로젝트 디렉토리에.env 파일을 만들고 dotenv 패키지를 import 해준다.\n.env 파일에 아래와 같이 ‘key=value’로 정의해주자.\n1234567HOST=127.0.0.1PORT=3900SECRET_KEY=ThIsIsMy$eCrEtMONGODB_CON_HOST=localhostMONGODB_SESSION_HOST=localhostMONGODB_PORT=27017MONGODB_NAME=testdb\n\nprocess.env 출력console.log(process.env); 를 코드 내에 추가하고 출력결과를 확인해보면,현재 컴퓨터에서 사용 중 인 환경변수뿐만 아니라 .env 에 정의한 key,value도 볼 수 있다.\n1234567891011121314151617181920212223242526&#123;    ALLUSERSPROFILE: 'C:\\\\ProgramData',    APPDATA: 'C:\\\\Users\\\\akanamed\\\\AppData\\\\Roaming',    COLORTERM: 'truecolor',    CommonProgramFiles: 'C:\\\\Program Files\\\\Common Files',    'CommonProgramFiles(x86)': 'C:\\\\Program Files (x86)\\\\Common Files',    CommonProgramW6432: 'C:\\\\Program Files\\\\Common Files',    COMPUTERNAME: 'AKANAMED-PC',    ComSpec: 'C:\\\\Windows\\\\system32\\\\cmd.exe',    dp0: 'D:\\\\test-api-server\\\\node_modules\\\\.bin\\\\',    DriverData: 'C:\\\\Windows\\\\System32\\\\Drivers\\\\DriverData',    HOME: 'C:\\\\Users\\\\akanamed',    HOMEDRIVE: 'C:',    HOMEPATH: '\\\\Users\\\\akanamed',    OS: 'Windows_NT',    ProgramData: 'C:\\\\ProgramData',    ProgramFiles: 'C:\\\\Program Files',    'ProgramFiles(x86)': 'C:\\\\Program Files (x86)',    ProgramW6432: 'C:\\\\Program Files',    ...    MONGODB_CON_HOST: 'localhost',    MONGODB_NAME: 'testdb',    MONGODB_PORT: '27017',    MONGODB_SESSION_HOST: 'localhost',    SECRET_KEY: 'ThIsIsMy$eCrEt',&#125;\n\n.env 환경 변수로 코드 수정app.js에서 첫번째 줄에 아래와 같이 import 해준다.\napp.js1import 'dotenv/config';\n\nimport hoistingES6에서 import는 순서에 따라 모듈을 불러오므로, 만약 환경변수를 사용하는 모듈보다나중에 import 하게되면 아래와 같이 undefined 에러가 뜬다.\n1Error: Error connecting to db: failed to connect to server [undefined:27017]\ncode 수정.env의 key를 사용하는 곳에 process.env.{key} 형태로 수정한다.localhost:3000/testdb 같은 문자열에서 여러군데를 수정해야 한다면backtick 문자를 사용하는 ES6의 템플릿 문자열로 아래와 같이 수정한다.\ndb/mongo.session.js1234567const uriString = `mongodb://$&#123;process.env.MONGODB_SESSION_HOST&#125;:$&#123;process.env.MONGODB_PORT&#125;/$&#123;process.env.MONGODB_NAME&#125;?connectTimeoutMS=5000`;const mongoStore = new MongoDBStore(    &#123;        uri: uriString,        databaseName: process.env.MONGODB_NAME        collection: process.env.MONGODB_COLLECTION    &#125;,\n\n한가지 더 주의해야 할 점은 process.env.PORT 키의 값인 3900은 문자열이다.그래서 express-generator로 생성한 프로젝트의 bin/www 내부에 normalizePort() 함수가 있는데,내부에 parseInt() 로 문자열 매개변수를 숫자로 변환하는 로직을 볼 수 있다.\n.env 를 .gitignore에 추가외부로 소스코드를 공개 시, 공유하면 안되는 혹은 중요한 정보보호를 위해 .env에 키를 추가하고git 사용자라면 .gitignore 에 .env를 포함하면 된다.프로덕션 레벨의 서버 빌드 및 배포로 webpack사용 시, dotenv-webpack 패키지를 사용하면 된다.\nDone.\n","dateCreated":"2020-01-09T16:50:31+09:00","dateModified":"2020-01-09T18:52:31+09:00","datePublished":"2020-01-09T16:50:31+09:00","description":"지금까지 만든 프로젝트에 서버 및 DB 접속 정보나 포트가 하드코딩되어있다.dotenv 패키지를 이용해 환경변수 파일을 만들고 관리한다.","headline":"Create Game api server with node.js express-5","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/09/express-apiserver-5/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/09/express-apiserver-5/","keywords":"express, apiserver"}</script>
+    <meta name="description" content="지금까지 만든 프로젝트에 서버 및 DB 접속 정보나 포트가 하드코딩되어있다.dotenv 패키지를 이용해 환경변수 파일을 만들고 관리한다.">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Create Game api server with node.js express-5">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;09&#x2F;express-apiserver-5&#x2F;index.html">
+<meta property="og:site_name" content="GameServerDevelop">
+<meta property="og:description" content="지금까지 만든 프로젝트에 서버 및 DB 접속 정보나 포트가 하드코딩되어있다.dotenv 패키지를 이용해 환경변수 파일을 만들고 관리한다.">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2020-01-09T07:50:31.000Z">
+<meta property="article:modified_time" content="2020-01-09T09:52:31.423Z">
+<meta property="article:author" content="akanamed">
+<meta property="article:tag" content="express">
+<meta property="article:tag" content="apiserver">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-vwaaiseervo0tukjf1ykkch1an7zafawceyrvpdkgar1zroez1rkqxu120gr.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154750067-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-154750067-1');
+    </script>
+
+
+    
+    <link rel="canonical" href="https://akanamed.github.io/2020/01/09/express-apiserver-5/">
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/" aria-label>
+            GameServerDevelop
+        </a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about" aria-label="링크 열기: /#about">
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/" title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="카테고리">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">카테고리</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="태그">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">태그</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="아카이브">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">아카이브</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="검색">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">검색</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="external nofollow noopener noreferrer" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/rss2.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4" class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Create Game api server with node.js express-5
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-09T16:50:31+09:00">
+	
+		    2020/01/09 16:50:31
+    	
+    </time>
+    
+        <span>카테고리 </span>
+        
+    <a class="category-link" href="/categories/nodejs/">nodejs</a>, <a class="category-link" href="/categories/nodejs/express/">express</a>
+
+
+    
+    <br>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-09T16:50:31+09:00">
+            
+                    2020/01/09 18:52:31
+                
+        </time>
+    
+</div>
+<!-- <div>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-09T16:50:31+09:00">
+            
+                    2020/01/09 18:52:31
+                
+        </time>
+    
+</div> -->
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>지금까지 만든 프로젝트에 서버 및 DB 접속 정보나 포트가 하드코딩되어있다.<br>dotenv 패키지를 이용해 환경변수 파일을 만들고 관리한다.</p>
+<a id="more"></a>
+<h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Node-js-process"><span class="toc-text">Node.js process</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#dotenv-설치"><span class="toc-text">dotenv 설치</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#create-env-file"><span class="toc-text">create .env file</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#process-env-출력"><span class="toc-text">process.env 출력</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#env-환경-변수로-코드-수정"><span class="toc-text">.env 환경 변수로 코드 수정</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#import-hoisting"><span class="toc-text">import hoisting</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#code-수정"><span class="toc-text">code 수정</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#env-를-gitignore에-추가"><span class="toc-text">.env 를 .gitignore에 추가</span></a></li></ol></li></ol>
+
+<h2 id="Node-js-process"><a href="#Node-js-process" class="headerlink" title="Node.js process"></a>Node.js process</h2><p>Node.js의 process 객체는 global이다.<br>즉, require() 를 사용하지 않고, 접근할 수 있으며, 현재 프로세스에 대한 정보와 제어를<br>할 수 있다.</p>
+<p>process 객체 중 이번 포스팅에서 다루는 건 env 환경 변수인데, dotenv 패키지를 이용해<br>프로젝트에서 사용할 환경 변수들의 정보를 .env 파일에 모아서 관리한다.</p>
+<h3 id="dotenv-설치"><a href="#dotenv-설치" class="headerlink" title="dotenv 설치"></a>dotenv 설치</h3><p>dotenv 패키지를 설치한다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm i dotenv --save</span><br></pre></td></tr></table></figure>
+<h3 id="create-env-file"><a href="#create-env-file" class="headerlink" title="create .env file"></a>create .env file</h3><p>현재 프로젝트에서 관리할 정보들을 환경변수로 등록하기 위해 프로젝트 디렉토리에<br>.env 파일을 만들고 dotenv 패키지를 import 해준다.</p>
+<p>.env 파일에 아래와 같이 ‘key=value’로 정의해주자.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">HOST=127.0.0.1</span><br><span class="line">PORT=3900</span><br><span class="line">SECRET_KEY=ThIsIsMy<span class="variable">$eCrEt</span></span><br><span class="line">MONGODB_CON_HOST=localhost</span><br><span class="line">MONGODB_SESSION_HOST=localhost</span><br><span class="line">MONGODB_PORT=27017</span><br><span class="line">MONGODB_NAME=testdb</span><br></pre></td></tr></table></figure>
+
+<h3 id="process-env-출력"><a href="#process-env-출력" class="headerlink" title="process.env 출력"></a>process.env 출력</h3><p>console.log(process.env); 를 코드 내에 추가하고 출력결과를 확인해보면,<br>현재 컴퓨터에서 사용 중 인 환경변수뿐만 아니라 .env 에 정의한 key,value도 볼 수 있다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    ALLUSERSPROFILE: <span class="string">'C:\\ProgramData'</span>,</span><br><span class="line">    APPDATA: <span class="string">'C:\\Users\\akanamed\\AppData\\Roaming'</span>,</span><br><span class="line">    COLORTERM: <span class="string">'truecolor'</span>,</span><br><span class="line">    CommonProgramFiles: <span class="string">'C:\\Program Files\\Common Files'</span>,</span><br><span class="line">    <span class="string">'CommonProgramFiles(x86)'</span>: <span class="string">'C:\\Program Files (x86)\\Common Files'</span>,</span><br><span class="line">    CommonProgramW6432: <span class="string">'C:\\Program Files\\Common Files'</span>,</span><br><span class="line">    COMPUTERNAME: <span class="string">'AKANAMED-PC'</span>,</span><br><span class="line">    ComSpec: <span class="string">'C:\\Windows\\system32\\cmd.exe'</span>,</span><br><span class="line">    dp0: <span class="string">'D:\\test-api-server\\node_modules\\.bin\\'</span>,</span><br><span class="line">    DriverData: <span class="string">'C:\\Windows\\System32\\Drivers\\DriverData'</span>,</span><br><span class="line">    HOME: <span class="string">'C:\\Users\\akanamed'</span>,</span><br><span class="line">    HOMEDRIVE: <span class="string">'C:'</span>,</span><br><span class="line">    HOMEPATH: <span class="string">'\\Users\\akanamed'</span>,</span><br><span class="line">    OS: <span class="string">'Windows_NT'</span>,</span><br><span class="line">    ProgramData: <span class="string">'C:\\ProgramData'</span>,</span><br><span class="line">    ProgramFiles: <span class="string">'C:\\Program Files'</span>,</span><br><span class="line">    <span class="string">'ProgramFiles(x86)'</span>: <span class="string">'C:\\Program Files (x86)'</span>,</span><br><span class="line">    ProgramW6432: <span class="string">'C:\\Program Files'</span>,</span><br><span class="line">    ...</span><br><span class="line">    MONGODB_CON_HOST: <span class="string">'localhost'</span>,</span><br><span class="line">    MONGODB_NAME: <span class="string">'testdb'</span>,</span><br><span class="line">    MONGODB_PORT: <span class="string">'27017'</span>,</span><br><span class="line">    MONGODB_SESSION_HOST: <span class="string">'localhost'</span>,</span><br><span class="line">    SECRET_KEY: <span class="string">'ThIsIsMy$eCrEt'</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="env-환경-변수로-코드-수정"><a href="#env-환경-변수로-코드-수정" class="headerlink" title=".env 환경 변수로 코드 수정"></a>.env 환경 변수로 코드 수정</h2><p>app.js에서 첫번째 줄에 아래와 같이 import 해준다.</p>
+<figure class="highlight objc"><figcaption><span>app.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import <span class="string">'dotenv/config'</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="import-hoisting"><a href="#import-hoisting" class="headerlink" title="import hoisting"></a>import hoisting</h3><p>ES6에서 import는 순서에 따라 모듈을 불러오므로, 만약 환경변수를 사용하는 모듈보다<br>나중에 import 하게되면 아래와 같이 undefined 에러가 뜬다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error: Error connecting to db: failed to connect to server [undefined:27017]</span><br></pre></td></tr></table></figure>
+<h3 id="code-수정"><a href="#code-수정" class="headerlink" title="code 수정"></a>code 수정</h3><p>.env의 key를 사용하는 곳에 process.env.{key} 형태로 수정한다.<br>localhost:3000/testdb 같은 문자열에서 여러군데를 수정해야 한다면<br>backtick 문자를 사용하는 ES6의 템플릿 문자열로 아래와 같이 수정한다.</p>
+<figure class="highlight objc"><figcaption><span>db/mongo.session.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> uriString = `mongodb:<span class="comment">//$&#123;process.env.MONGODB_SESSION_HOST&#125;:$&#123;process.env.MONGODB_PORT&#125;/$&#123;process.env.MONGODB_NAME&#125;?connectTimeoutMS=5000`;</span></span><br><span class="line"><span class="keyword">const</span> mongoStore = new MongoDBStore(</span><br><span class="line">    &#123;</span><br><span class="line">        uri: uriString,</span><br><span class="line">        databaseName: process.env.MONGODB_NAME</span><br><span class="line">        collection: process.env.MONGODB_COLLECTION</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure>
+
+<p>한가지 더 주의해야 할 점은 process.env.PORT 키의 값인 3900은 문자열이다.<br>그래서 express-generator로 생성한 프로젝트의 bin/www 내부에 normalizePort() 함수가 있는데,<br>내부에 parseInt() 로 문자열 매개변수를 숫자로 변환하는 로직을 볼 수 있다.</p>
+<h3 id="env-를-gitignore에-추가"><a href="#env-를-gitignore에-추가" class="headerlink" title=".env 를 .gitignore에 추가"></a>.env 를 .gitignore에 추가</h3><p>외부로 소스코드를 공개 시, 공유하면 안되는 혹은 중요한 정보보호를 위해 .env에 키를 추가하고<br>git 사용자라면 .gitignore 에 .env를 포함하면 된다.<br>프로덕션 레벨의 서버 빌드 및 배포로 webpack사용 시, dotenv-webpack 패키지를 사용하면 된다.</p>
+<p>Done.</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">태그</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/apiserver/" rel="tag">apiserver</a> <a class="tag tag--primary tag--small t-link" href="/tags/express/" rel="tag">express</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/07/express-apiserver-4/" data-tooltip="Create Game api server with node.js express-4" aria-label="다음: Create Game api server with node.js express-4">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/09/express-apiserver-5/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/09/express-apiserver-5/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/09/express-apiserver-5/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <script src="https://utteranc.es/client.js" repo="akanamed/blog-comments" issue-term="title" theme="github-light" crossorigin="anonymous" async>
+</script>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 akanamed. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/07/express-apiserver-4/" data-tooltip="Create Game api server with node.js express-4" aria-label="다음: Create Game api server with node.js express-4">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/09/express-apiserver-5/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/09/express-apiserver-5/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/09/express-apiserver-5/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/09/express-apiserver-5/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/09/express-apiserver-5/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/09/express-apiserver-5/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">akanamed</h4>
+        
+            <div id="about-card-bio"><p>Programmer</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Game Server</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Seoul, Korea
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-jhmvorfn4yzoudzvxxswsuxz7dtaisubpiwxbc3nj4cz4zsv7zhxzdievzvl.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+
+
+
+
+    </body>
+</html>
