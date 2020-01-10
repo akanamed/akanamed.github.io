@@ -8,6 +8,14 @@
     </url>
 
     <url>
+        <loc>https://akanamed.github.io/2020/01/10/nodejs-exports-module/</loc>
+        <lastmod>2020-01-10T08:00:50.257Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://akanamed.github.io/2020/01/09/express-apiserver-5/</loc>
         <lastmod>2020-01-09T09:52:31.423Z</lastmod>
         <changefreq>weekly</changefreq>

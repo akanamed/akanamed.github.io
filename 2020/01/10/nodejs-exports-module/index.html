@@ -1,0 +1,552 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="GameServerDevelop">
+    <title>Node.js 에서 exports vs Module.exports - GameServerDevelop</title>
+    <meta name="author" content="akanamed">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"Node.js에서 exports 와 Module.exports의 차이에 대해 알아보자.\n\n\n\nmoduletest.js 파일을 만들고 node 커맨드로 콘솔 로그로 출력한다.\ntest.js1console.log(module);\n\n123456789101112131415D:\\test-api-server&gt;node src/test.jsModule &#123;  id: '.',  path: 'D:\\\\test-api-server\\\\src',  exports: &#123;&#125;,  parent: null,  filename: 'D:\\\\test-api-server\\\\src\\\\test.js',  loaded: false,  children: [],  paths: [    'D:\\\\test-api-server\\\\src\\\\node_modules',    'D:\\\\test-api-server\\\\node_modules',    'D:\\\\node_modules'  ]&#125;\nmodule 객체에 대한 정보를 볼 수 있다.컨텍스트 정보 중 exports 객체는 모듈로 가져올 프로퍼티, 메소드들이 저장되는 곳인데아직 아무런 할당을 하지 않았으므로 빈 오브젝트로 초기화 되어있다.\nexportstest.js 를 수정해서 exports 객체로 프로퍼티를 할당해보자.\ntest.js123exports.a = 'A';exports.b = 'B';console.log(module);\n\n1234Module &#123;  id: '.',  exports: &#123; a: 'A', b: 'B' &#125;,  ...\nexports 객체로 프로퍼티들을 할당하면 modules.exports에도 추가되어 있다.Node.js의 모듈 시스템에서 실제로 익스포트 되는 객체는 module.exports 이고,exports 객체는 modules.exports를 참조하고 있는 변수에 불과하다.\nmodule.exports그럼 이번에는 module.exports에 프로퍼티를 추가해보자.\ntest.js123module.exports.a = 'A';module.exports.b = 'B';console.log(module);\n\n1234Module &#123;  id: '.',  exports: &#123; a: 'A', b: 'B' &#125;,  ...\n결과는 동일하다.\nexports 와 module.exports그럼 exports 객체는 항상 module.exports를 참조하고 있을까?\n1.\ntest.js1234module.exports = &#123; a: 'A', b: 'B' &#125;;console.log(exports === module.exports);console.log(exports);console.log(module);\n\n1234567falseModule &#123;  id: '.',  exports: &#123; a: 'A', b: 'B' &#125;,  ...&#125;&#123;&#125;\n\n위 예제들과 같은 프로퍼티 값들이 할당되어 있다.하지만 module.exports에 프로퍼티가 아닌 객체를 할당하면 참조하고 있는 exports 객체는관련없는 객체가 되어버린다.따라서 exports 객체가 module.exports 와 같지 않고, 비어있다.\n2.\ntest.js12345678910module.exports = &#123;    a: 'A'&#125;;exports = &#123;    b: 'B'&#125;console.log(exports === module.exports);console.log(module);console.log(exports);\n\n1234567falseModule &#123;  id: '.',  exports: &#123; a: 'A' &#125;,  ...&#125;&#123; b: 'B' &#125;\n\nexports 객체는 별도로 저장되고, 외부로 전달되지 않는다.test.js에서는 무시되며 module.exports와 전혀 관련없는 객체임을 알 수 있다.\n정리exports 객체는 module.exports 를 참조하고 있으며 최종적으로 리턴되는 값은module.exports 이다.\n참고링크Node.js: exports vs module.exportsUnderstanding module.exports and exports in Node.jsnode.js의 module.exports와 exports\n","dateCreated":"2020-01-10T14:53:43+09:00","dateModified":"2020-01-10T17:00:50+09:00","datePublished":"2020-01-10T14:53:43+09:00","description":"Node.js에서 exports 와 Module.exports의 차이에 대해 알아보자.","headline":"Node.js 에서 exports vs Module.exports","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/10/nodejs-exports-module/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/10/nodejs-exports-module/","keywords":"nodejs, module, export"}</script>
+    <meta name="description" content="Node.js에서 exports 와 Module.exports의 차이에 대해 알아보자.">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Node.js 에서 exports vs Module.exports">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;10&#x2F;nodejs-exports-module&#x2F;index.html">
+<meta property="og:site_name" content="GameServerDevelop">
+<meta property="og:description" content="Node.js에서 exports 와 Module.exports의 차이에 대해 알아보자.">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2020-01-10T05:53:43.000Z">
+<meta property="article:modified_time" content="2020-01-10T08:00:50.257Z">
+<meta property="article:author" content="akanamed">
+<meta property="article:tag" content="nodejs">
+<meta property="article:tag" content="module">
+<meta property="article:tag" content="export">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-ah18pr0cxbh3utvgstamllxkjozphocgsf5bjs9cfidxlktac01qhi73mwd7.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154750067-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-154750067-1');
+    </script>
+
+
+    
+    <link rel="canonical" href="https://akanamed.github.io/2020/01/10/nodejs-exports-module/">
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/" aria-label>
+            GameServerDevelop
+        </a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about" aria-label="링크 열기: /#about">
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/" title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="카테고리">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">카테고리</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="태그">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">태그</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="아카이브">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">아카이브</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="검색">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">검색</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="external nofollow noopener noreferrer" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/rss2.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4" class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Node.js 에서 exports vs Module.exports
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-10T14:53:43+09:00">
+	
+		    2020/01/10 14:53:43
+    	
+    </time>
+    
+        <span>카테고리 </span>
+        
+    <a class="category-link" href="/categories/nodejs/">nodejs</a>
+
+
+    
+    <br>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-10T14:53:43+09:00">
+            
+                    2020/01/10 17:00:50
+                
+        </time>
+    
+</div>
+<!-- <div>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-10T14:53:43+09:00">
+            
+                    2020/01/10 17:00:50
+                
+        </time>
+    
+</div> -->
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>Node.js에서 exports 와 Module.exports의 차이에 대해 알아보자.</p>
+<a id="more"></a>
+<h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#module"><span class="toc-text">module</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#exports"><span class="toc-text">exports</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-exports"><span class="toc-text">module.exports</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#exports-와-module-exports"><span class="toc-text">exports 와 module.exports</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#정리"><span class="toc-text">정리</span></a></li></ol>
+
+<h2 id="module"><a href="#module" class="headerlink" title="module"></a>module</h2><p>test.js 파일을 만들고 node 커맨드로 콘솔 로그로 출력한다.</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">console.log(module);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">D:\<span class="built_in">test</span>-api-server&gt;node src/test.js</span><br><span class="line">Module &#123;</span><br><span class="line">  id: <span class="string">'.'</span>,</span><br><span class="line">  path: <span class="string">'D:\\test-api-server\\src'</span>,</span><br><span class="line">  exports: &#123;&#125;,</span><br><span class="line">  parent: null,</span><br><span class="line">  filename: <span class="string">'D:\\test-api-server\\src\\test.js'</span>,</span><br><span class="line">  loaded: <span class="literal">false</span>,</span><br><span class="line">  children: [],</span><br><span class="line">  paths: [</span><br><span class="line">    <span class="string">'D:\\test-api-server\\src\\node_modules'</span>,</span><br><span class="line">    <span class="string">'D:\\test-api-server\\node_modules'</span>,</span><br><span class="line">    <span class="string">'D:\\node_modules'</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>module 객체에 대한 정보를 볼 수 있다.<br>컨텍스트 정보 중 exports 객체는 모듈로 가져올 프로퍼티, 메소드들이 저장되는 곳인데<br>아직 아무런 할당을 하지 않았으므로 빈 오브젝트로 초기화 되어있다.</p>
+<h3 id="exports"><a href="#exports" class="headerlink" title="exports"></a>exports</h3><p>test.js 를 수정해서 exports 객체로 프로퍼티를 할당해보자.</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">exports.a = <span class="string">'A'</span>;</span><br><span class="line">exports.b = <span class="string">'B'</span>;</span><br><span class="line">console.log(module);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Module &#123;</span><br><span class="line">  id: <span class="string">'.'</span>,</span><br><span class="line">  exports: &#123; a: <span class="string">'A'</span>, b: <span class="string">'B'</span> &#125;,</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>exports 객체로 프로퍼티들을 할당하면 modules.exports에도 추가되어 있다.<br>Node.js의 모듈 시스템에서 실제로 익스포트 되는 객체는 module.exports 이고,<br>exports 객체는 modules.exports를 참조하고 있는 변수에 불과하다.</p>
+<h3 id="module-exports"><a href="#module-exports" class="headerlink" title="module.exports"></a>module.exports</h3><p>그럼 이번에는 module.exports에 프로퍼티를 추가해보자.</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">module.exports.a = <span class="string">'A'</span>;</span><br><span class="line">module.exports.b = <span class="string">'B'</span>;</span><br><span class="line">console.log(module);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Module &#123;</span><br><span class="line">  id: <span class="string">'.'</span>,</span><br><span class="line">  exports: &#123; a: <span class="string">'A'</span>, b: <span class="string">'B'</span> &#125;,</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>결과는 동일하다.</p>
+<h2 id="exports-와-module-exports"><a href="#exports-와-module-exports" class="headerlink" title="exports 와 module.exports"></a>exports 와 module.exports</h2><p>그럼 exports 객체는 항상 module.exports를 참조하고 있을까?</p>
+<p>1.</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">module.exports = &#123; a: <span class="string">'A'</span>, b: <span class="string">'B'</span> &#125;;</span><br><span class="line">console.log(exports === module.exports);</span><br><span class="line">console.log(exports);</span><br><span class="line">console.log(module);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">false</span></span><br><span class="line">Module &#123;</span><br><span class="line">  id: <span class="string">'.'</span>,</span><br><span class="line">  exports: &#123; a: <span class="string">'A'</span>, b: <span class="string">'B'</span> &#125;,</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>위 예제들과 같은 프로퍼티 값들이 할당되어 있다.<br>하지만 module.exports에 프로퍼티가 아닌 객체를 할당하면 참조하고 있는 exports 객체는<br>관련없는 객체가 되어버린다.<br>따라서 exports 객체가 module.exports 와 같지 않고, 비어있다.</p>
+<p>2.</p>
+<figure class="highlight objc"><figcaption><span>test.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">module.exports = &#123;</span><br><span class="line">    a: <span class="string">'A'</span></span><br><span class="line">&#125;;</span><br><span class="line">exports = &#123;</span><br><span class="line">    b: <span class="string">'B'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(exports === module.exports);</span><br><span class="line">console.log(module);</span><br><span class="line">console.log(exports);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="literal">false</span></span><br><span class="line">Module &#123;</span><br><span class="line">  id: <span class="string">'.'</span>,</span><br><span class="line">  exports: &#123; a: <span class="string">'A'</span> &#125;,</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line">&#123; b: <span class="string">'B'</span> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>exports 객체는 별도로 저장되고, 외부로 전달되지 않는다.<br>test.js에서는 무시되며 module.exports와 전혀 관련없는 객체임을 알 수 있다.</p>
+<h2 id="정리"><a href="#정리" class="headerlink" title="정리"></a>정리</h2><p>exports 객체는 module.exports 를 참조하고 있으며 최종적으로 리턴되는 값은<br>module.exports 이다.</p>
+<p>참고링크<br><a href="https://www.hacksparrow.com/nodejs/exports-vs-module-exports.html" target="_blank" rel="external nofollow noopener noreferrer">Node.js: exports vs module.exports</a><br><a href="https://www.sitepoint.com/understanding-module-exports-exports-node-js/" target="_blank" rel="external nofollow noopener noreferrer">Understanding module.exports and exports in Node.js</a><br><a href="https://edykim.com/ko/post/module.exports-and-exports-in-node.js/" target="_blank" rel="external nofollow noopener noreferrer">node.js의 module.exports와 exports</a></p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">태그</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/export/" rel="tag">export</a> <a class="tag tag--primary tag--small t-link" href="/tags/module/" rel="tag">module</a> <a class="tag tag--primary tag--small t-link" href="/tags/nodejs/" rel="tag">nodejs</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/09/express-apiserver-5/" data-tooltip="Create Game api server with node.js express-5" aria-label="다음: Create Game api server with node.js express-5">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="댓글을 남겨주세요">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 akanamed. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/09/express-apiserver-5/" data-tooltip="Create Game api server with node.js express-5" aria-label="다음: Create Game api server with node.js express-5">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="댓글을 남겨주세요">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/10/nodejs-exports-module/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">akanamed</h4>
+        
+            <div id="about-card-bio"><p>Programmer</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Game Server</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Seoul, Korea
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-azyaxdbdxqyxe97nvf72hm0mrtxjd9ihias9hefytvnykjrcsingzw8swgno.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://akanamed.github.io/2020/01/10/nodejs-exports-module/';
+              
+            this.page.identifier = '2020/01/10/nodejs-exports-module/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'gameserverdevelop';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+
+    </body>
+</html>

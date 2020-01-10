@@ -3,6 +3,27 @@
 
 
     <url>
+        <loc>https://akanamed.github.io/tags/export/</loc>
+        <lastmod>2020-01-10T08:00:50.257Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/tags/module/</loc>
+        <lastmod>2020-01-10T08:00:50.257Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://akanamed.github.io/tags/nodejs/</loc>
+        <lastmod>2020-01-10T08:00:50.257Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://akanamed.github.io/tags/apiserver/</loc>
         <lastmod>2020-01-09T09:52:31.423Z</lastmod>
         <changefreq>weekly</changefreq>
