@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="GameServerDevelop">
+    <title>Create Game api server with node.js express-6 - GameServerDevelop</title>
+    <meta name="author" content="akanamed">
+    
+    
+    
+        <link rel="alternate" type="application/atom+xml" title="RSS" href="/rss2.xml">
+    
+    <script type="application/ld+json">{"@context":"http://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"},"articleBody":"passport 인증 미들웨어를 추가하고, User Schema에서 예외처리 및중복관련 처리를 보완한다.\n\n\n\nmongoose schema validate이전까지 만든 UserSchema 구조는 userid에 빈 문자열이 들어와도 DB에 저장이 된다.Mongoose Custom Validators 문서를 참고하여아래와 같이 조건검사를 추가한다.userid는 regexp를 이용하여 영문자,숫자 조합만 허용하며, 4~12 길이제한을 둔다.password는 4글자 이상만 허용한다.\n\n\npostman으로 post 요청(http://127.0.0.1:3900/auth/create)을 아래와 같이 보내보면,\n12345678910111213141516171819request:&#123;    \"userid\": \"cc!!@#\",\t\"password\": \"1235\"&#125;response:&#123;    \"message\": \"User validation failed: userid: user id is not allow text, password: password is short, at least 4characters\"&#125;result:ValidationError: User validation failed: userid: user id is not allow text, password: password is short, at least 4characters    at new ValidationError (D:\\test-api-server\\node_modules\\mongoose\\lib\\error\\validation.js:31:11)    at model.Document.invalidate (D:\\test-api-server\\node_modules\\mongoose\\lib\\document.js:2461:32)    at p.doValidate.skipSchemaValidators (D:\\test-api-server\\node_modules\\mongoose\\lib\\document.js:2310:17)    at D:\\test-api-server\\node_modules\\mongoose\\lib\\schematype.js:1064:9    at processTicksAndRejections (internal/process/task_queues.js:75:11)POST /auth/create 422 40.593 ms - 122\nValidationError 를 볼 수 있다.\n/auth/create 중복 처리이제 validation 까지 처리는 되었지만, 중복가입에 대한 처리는 되어 있지 않다.this.model.findOne 으로 검색 후, db에 값이 없다면 신규 생성이므로 create를 이어서 요청하고,db에 값이 있다면, /auth/login/fail 로 redirect 해준다.\nauth.controller.js1234567891011121314151617181920exports.createUser = (req, res, next) =&gt; &#123;    const user = req.body;    UserRepository.findOne(user.userid)        .then((searchUser) =&gt; &#123;            if (searchUser === null) &#123;                console.log('search user is null');                return UserRepository.create(user);            &#125;            return res.redirect('/auth/login/fail');        &#125;)        .then((createUser) =&gt; &#123;            res.json(createUser);        &#125;)        .catch((error) =&gt; &#123;            res.status(422).json(&#123;                error            &#125;);        &#125;);&#125;;\n\n번외 : async / await 를 이용한 방법위와 동일한 코드지만, Node.js v7 부터 지원되는 async/await 로 아래와 같이 변경도 가능하다.\nauth.controller.js12345678910111213141516exports.createUser = async (req, res, next) =&gt; &#123;    try &#123;        const user = req.body;        const searchUser = await UserRepository.findOne(user.userid);        if (searchUser) &#123;            res.redirect('/auth/login/fail');        &#125; else &#123;            const createUser = await UserRepository.create(user);            res.json(createUser);        &#125;    &#125; catch (error) &#123;        console.log('error');        error.status = 422;        next(error);    &#125;&#125;;\n\n주의해야 할 점은 express 라우터에서 async 함수 내에서 에러 발생 시, 에러 처리 미들웨어가오류를 인식하지 못한다는 점이다. 그래서 try / catch 로 감싸줘야 한다.라우팅핸들러 async/await 의 링크에 잘 나와있다.\npassport 미들웨어 적용구글 검색하면 passport 관련 설명은 워낙 잘되어 있으므로 생략하고,passport 공식 문서를 참고하여,passport 관련 미들웨어들을 설치하고 localstrategy 를 이용해 인증처리를 한다.\n1npm i passport passport-local --save\n\n아래와 같이 passport 모듈을 만들어 준다.\nconfig/passport.js123456789101112131415161718192021222324252627import passportLocal from 'passport-local';const LocalStrategy = passportLocal.Strategy;import UserRepository from '../models/repository/userRepository';module.exports = (passport) =&gt; &#123;    passport.serializeUser((user, done) =&gt; &#123;        console.log('serializeUser');        done(null, user);    &#125;);    passport.deserializeUser((user, done) =&gt; &#123;        console.log('deserializeUser');        done(null, user);    &#125;);    passport.use(new LocalStrategy(&#123;        usernameField: 'userid',        passwordField: 'password'    &#125;, (userid, password, done) =&gt; UserRepository.findOne(userid)        .then((resultUser) =&gt; &#123;            if (resultUser === null) &#123;                console.log('resultUser');                return done(null, false);            &#125;            return done(null, resultUser);        &#125;)        .catch((err) =&gt; done(err))));&#125;;\n\napp.js 에 passport 관련 미들웨어를 등록하는데, 세션 저장소를 사용하고 있다면,반드시 아래와 같이 session 등록 이후에 passport 미들웨어를 등록해야 한다.\napp.js1234app.use(session( ... ))app.use(passport.initialize());app.use(passport.session());passportConfig(passport);\n\n마지막으로, /auth/login 시, passport.authenticate(‘local’) 방식으로 인증처리 되도록수정한다.\nauth.controller.js12345678910111213141516171819exports.login = (req, res, next) =&gt; &#123;    const user = req.body;    console.log('%s, %s', user.userid, user.password);    passport.authenticate('local', &#123; session: false &#125;, (err, result, info) =&gt; &#123;        if (err) &#123;            return next(err);        &#125;        if (result === null || result === false) &#123;            return res.redirect('/auth/login/fail');        &#125;        return req.login(result, (error) =&gt; &#123;            console.log('call req.login');            if (error) &#123;                next(error);            &#125;            res.redirect('/auth/login/success');        &#125;);    &#125;)(req, res, next);&#125;\n\nDone.\n","dateCreated":"2020-01-15T19:07:03+09:00","dateModified":"2020-01-15T20:01:15+09:00","datePublished":"2020-01-15T19:07:03+09:00","description":"passport 인증 미들웨어를 추가하고, User Schema에서 예외처리 및중복관련 처리를 보완한다.","headline":"Create Game api server with node.js express-6","image":[],"mainEntityOfPage":{"@type":"WebPage","@id":"https://akanamed.github.io/2020/01/15/express-apiserver-6/"},"publisher":{"@type":"Organization","name":"akanamed","sameAs":["https://github.com/akanamed"],"image":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317","logo":{"@type":"ImageObject","url":"https://www.gravatar.com/avatar/9c3473c67bd892cf5cc9f2cc92dfd317"}},"url":"https://akanamed.github.io/2020/01/15/express-apiserver-6/","keywords":"express, apiserver"}</script>
+    <meta name="description" content="passport 인증 미들웨어를 추가하고, User Schema에서 예외처리 및중복관련 처리를 보완한다.">
+<meta property="og:type" content="blog">
+<meta property="og:title" content="Create Game api server with node.js express-6">
+<meta property="og:url" content="https:&#x2F;&#x2F;akanamed.github.io&#x2F;2020&#x2F;01&#x2F;15&#x2F;express-apiserver-6&#x2F;index.html">
+<meta property="og:site_name" content="GameServerDevelop">
+<meta property="og:description" content="passport 인증 미들웨어를 추가하고, User Schema에서 예외처리 및중복관련 처리를 보완한다.">
+<meta property="og:locale" content="ko_KR">
+<meta property="article:published_time" content="2020-01-15T10:07:03.000Z">
+<meta property="article:modified_time" content="2020-01-15T11:01:15.970Z">
+<meta property="article:author" content="akanamed">
+<meta property="article:tag" content="express">
+<meta property="article:tag" content="apiserver">
+<meta name="twitter:card" content="summary">
+    
+    
+        
+    
+    
+    
+    
+    
+    <!--STYLES-->
+    
+<link rel="stylesheet" href="/assets/css/style-ah18pr0cxbh3utvgstamllxkjozphocgsf5bjs9cfidxlktac01qhi73mwd7.min.css">
+
+    <!--STYLES END-->
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154750067-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-154750067-1');
+    </script>
+
+
+    
+    <link rel="canonical" href="https://akanamed.github.io/2020/01/15/express-apiserver-6/">
+    
+        
+    
+</head>
+
+    <body>
+        <div id="blog">
+            <!-- Define author's picture -->
+
+
+    
+
+<header id="header" data-behavior="4">
+    <i id="btn-open-sidebar" class="fa fa-lg fa-bars"></i>
+    <div class="header-title">
+        <a class="header-title-link" href="/" aria-label>
+            GameServerDevelop
+        </a>
+    </div>
+    
+        
+            <a class="header-right-picture " href="#about" aria-label="링크 열기: /#about">
+        
+        
+        </a>
+    
+</header>
+
+            <!-- Define author's picture -->
+
+
+<nav id="sidebar" data-behavior="4">
+    <div class="sidebar-container">
+        
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/" title="Home">
+                    
+                        <i class="sidebar-button-icon fa fa-home" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">Home</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-categories" title="카테고리">
+                    
+                        <i class="sidebar-button-icon fa fa-bookmark" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">카테고리</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-tags" title="태그">
+                    
+                        <i class="sidebar-button-icon fa fa-tags" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">태그</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/all-archives" title="아카이브">
+                    
+                        <i class="sidebar-button-icon fa fa-archive" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">아카이브</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link open-algolia-search" href="#search" title="검색">
+                    
+                        <i class="sidebar-button-icon fa fa-search" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">검색</span>
+                    </a>
+            </li>
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="#about" title="About">
+                    
+                        <i class="sidebar-button-icon fa fa-question" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">About</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="https://github.com/akanamed" target="_blank" rel="external nofollow noopener noreferrer" title="GitHub">
+                    
+                        <i class="sidebar-button-icon fab fa-github" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">GitHub</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+            <ul class="sidebar-buttons">
+            
+                <li class="sidebar-button">
+                    
+                        <a class="sidebar-button-link " href="/rss2.xml" title="RSS">
+                    
+                        <i class="sidebar-button-icon fa fa-rss" aria-hidden="true"></i>
+                        <span class="sidebar-button-desc">RSS</span>
+                    </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+</nav>
+
+            
+            <div id="main" data-behavior="4" class="
+                        hasCoverMetaIn
+                        ">
+                
+<article class="post">
+    
+    
+        <div class="post-header main-content-wrap text-left">
+    
+        <h1 class="post-title">
+            Create Game api server with node.js express-6
+        </h1>
+    
+    
+        <div class="post-meta">
+    <time datetime="2020-01-15T19:07:03+09:00">
+	
+		    2020/01/15 19:07:03
+    	
+    </time>
+    
+        <span>카테고리 </span>
+        
+    <a class="category-link" href="/categories/nodejs/">nodejs</a>, <a class="category-link" href="/categories/nodejs/express/">express</a>
+
+
+    
+    <br>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-15T19:07:03+09:00">
+            
+                    2020/01/15 20:01:15
+                
+        </time>
+    
+</div>
+<!-- <div>
+    
+        <span>LastUpdated  </span>
+        <time datetime="2020-01-15T19:07:03+09:00">
+            
+                    2020/01/15 20:01:15
+                
+        </time>
+    
+</div> -->
+    
+</div>
+
+    
+    <div class="post-content markdown">
+        <div class="main-content-wrap">
+            <p>passport 인증 미들웨어를 추가하고, User Schema에서 예외처리 및<br>중복관련 처리를 보완한다.</p>
+<a id="more"></a>
+<h1 id="table-of-contents">목차</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#mongoose-schema-validate"><span class="toc-text">mongoose schema validate</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#auth-create-중복-처리"><span class="toc-text">&#x2F;auth&#x2F;create 중복 처리</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#번외-async-await-를-이용한-방법"><span class="toc-text">번외 : async &#x2F; await 를 이용한 방법</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#passport-미들웨어-적용"><span class="toc-text">passport 미들웨어 적용</span></a></li></ol>
+
+<h2 id="mongoose-schema-validate"><a href="#mongoose-schema-validate" class="headerlink" title="mongoose schema validate"></a>mongoose schema validate</h2><p>이전까지 만든 UserSchema 구조는 userid에 빈 문자열이 들어와도 DB에 저장이 된다.<br><a href="https://mongoosejs.com/docs/validation.html#custom-validators" target="_blank" rel="external nofollow noopener noreferrer">Mongoose Custom Validators</a> 문서를 참고하여<br>아래와 같이 조건검사를 추가한다.<br>userid는 regexp를 이용하여 영문자,숫자 조합만 허용하며, 4~12 길이제한을 둔다.<br>password는 4글자 이상만 허용한다.</p>
+<script src="//gist.github.com/f928883c14de488d5b003f1de89618c7.js"></script>
+
+<p>postman으로 post 요청(<a href="http://127.0.0.1:3900/auth/create)을" target="_blank" rel="external nofollow noopener noreferrer">http://127.0.0.1:3900/auth/create)을</a> 아래와 같이 보내보면,</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">request:</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"userid"</span>: <span class="string">"cc!!@#"</span>,</span><br><span class="line">	<span class="string">"password"</span>: <span class="string">"1235"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">response:</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"message"</span>: <span class="string">"User validation failed: userid: user id is not allow text, password: password is short, at least 4characters"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">result:</span><br><span class="line">ValidationError: User validation failed: userid: user id is not allow text, password: password is short, at least 4characters</span><br><span class="line">    at new ValidationError (D:\<span class="built_in">test</span>-api-server\node_modules\mongoose\lib\error\validation.js:31:11)</span><br><span class="line">    at model.Document.invalidate (D:\<span class="built_in">test</span>-api-server\node_modules\mongoose\lib\document.js:2461:32)</span><br><span class="line">    at p.doValidate.skipSchemaValidators (D:\<span class="built_in">test</span>-api-server\node_modules\mongoose\lib\document.js:2310:17)</span><br><span class="line">    at D:\<span class="built_in">test</span>-api-server\node_modules\mongoose\lib\schematype.js:1064:9</span><br><span class="line">    at processTicksAndRejections (internal/process/task_queues.js:75:11)</span><br><span class="line">POST /auth/create 422 40.593 ms - 122</span><br></pre></td></tr></table></figure>
+<p>ValidationError 를 볼 수 있다.</p>
+<h3 id="auth-create-중복-처리"><a href="#auth-create-중복-처리" class="headerlink" title="/auth/create 중복 처리"></a>/auth/create 중복 처리</h3><p>이제 validation 까지 처리는 되었지만, 중복가입에 대한 처리는 되어 있지 않다.<br>this.model.findOne 으로 검색 후, db에 값이 없다면 신규 생성이므로 create를 이어서 요청하고,<br>db에 값이 있다면, /auth/login/fail 로 redirect 해준다.</p>
+<figure class="highlight objc"><figcaption><span>auth.controller.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">exports.createUser = (req, res, next) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> user = req.body;</span><br><span class="line"></span><br><span class="line">    UserRepository.findOne(user.userid)</span><br><span class="line">        .then((searchUser) =&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (searchUser === null) &#123;</span><br><span class="line">                console.log(<span class="string">'search user is null'</span>);</span><br><span class="line">                <span class="keyword">return</span> UserRepository.create(user);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> res.redirect(<span class="string">'/auth/login/fail'</span>);</span><br><span class="line">        &#125;)</span><br><span class="line">        .then((createUser) =&gt; &#123;</span><br><span class="line">            res.json(createUser);</span><br><span class="line">        &#125;)</span><br><span class="line">        .catch((error) =&gt; &#123;</span><br><span class="line">            res.status(<span class="number">422</span>).json(&#123;</span><br><span class="line">                error</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<h3 id="번외-async-await-를-이용한-방법"><a href="#번외-async-await-를-이용한-방법" class="headerlink" title="번외 : async / await 를 이용한 방법"></a>번외 : async / await 를 이용한 방법</h3><p>위와 동일한 코드지만, Node.js v7 부터 지원되는 async/await 로 아래와 같이 변경도 가능하다.</p>
+<figure class="highlight objc"><figcaption><span>auth.controller.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">exports.createUser = async (req, res, next) =&gt; &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">        <span class="keyword">const</span> user = req.body;</span><br><span class="line">        <span class="keyword">const</span> searchUser = await UserRepository.findOne(user.userid);</span><br><span class="line">        <span class="keyword">if</span> (searchUser) &#123;</span><br><span class="line">            res.redirect(<span class="string">'/auth/login/fail'</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> createUser = await UserRepository.create(user);</span><br><span class="line">            res.json(createUser);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; catch (error) &#123;</span><br><span class="line">        console.log(<span class="string">'error'</span>);</span><br><span class="line">        error.status = <span class="number">422</span>;</span><br><span class="line">        next(error);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>주의해야 할 점은 express 라우터에서 async 함수 내에서 에러 발생 시, 에러 처리 미들웨어가<br>오류를 인식하지 못한다는 점이다. 그래서 try / catch 로 감싸줘야 한다.<br><a href="https://programmingsummaries.tistory.com/399" target="_blank" rel="external nofollow noopener noreferrer">라우팅핸들러 async/await</a> 의 링크에 잘 나와있다.</p>
+<h2 id="passport-미들웨어-적용"><a href="#passport-미들웨어-적용" class="headerlink" title="passport 미들웨어 적용"></a>passport 미들웨어 적용</h2><p>구글 검색하면 passport 관련 설명은 워낙 잘되어 있으므로 생략하고,<br><a href="http://www.passportjs.org/docs/" target="_blank" rel="external nofollow noopener noreferrer">passport 공식 문서</a>를 참고하여,<br>passport 관련 미들웨어들을 설치하고 localstrategy 를 이용해 인증처리를 한다.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i passport passport-local --save</span><br></pre></td></tr></table></figure>
+
+<p>아래와 같이 passport 모듈을 만들어 준다.</p>
+<figure class="highlight objc"><figcaption><span>config/passport.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import passportLocal from <span class="string">'passport-local'</span>;</span><br><span class="line"><span class="keyword">const</span> LocalStrategy = passportLocal.Strategy;</span><br><span class="line">import UserRepository from <span class="string">'../models/repository/userRepository'</span>;</span><br><span class="line"></span><br><span class="line">module.exports = (passport) =&gt; &#123;</span><br><span class="line">    passport.serializeUser((user, done) =&gt; &#123;</span><br><span class="line">        console.log(<span class="string">'serializeUser'</span>);</span><br><span class="line">        done(null, user);</span><br><span class="line">    &#125;);</span><br><span class="line">    passport.deserializeUser((user, done) =&gt; &#123;</span><br><span class="line">        console.log(<span class="string">'deserializeUser'</span>);</span><br><span class="line">        done(null, user);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    passport.use(new LocalStrategy(&#123;</span><br><span class="line">        usernameField: <span class="string">'userid'</span>,</span><br><span class="line">        passwordField: <span class="string">'password'</span></span><br><span class="line">    &#125;, (userid, password, done) =&gt; UserRepository.findOne(userid)</span><br><span class="line">        .then((resultUser) =&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (resultUser === null) &#123;</span><br><span class="line">                console.log(<span class="string">'resultUser'</span>);</span><br><span class="line">                <span class="keyword">return</span> done(null, <span class="literal">false</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> done(null, resultUser);</span><br><span class="line">        &#125;)</span><br><span class="line">        .catch((err) =&gt; done(err))));</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>app.js 에 passport 관련 미들웨어를 등록하는데, 세션 저장소를 사용하고 있다면,<br>반드시 아래와 같이 session 등록 이후에 passport 미들웨어를 등록해야 한다.</p>
+<figure class="highlight objc"><figcaption><span>app.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">app.use(session( ... ))</span><br><span class="line">app.use(passport.initialize());</span><br><span class="line">app.use(passport.session());</span><br><span class="line">passportConfig(passport);</span><br></pre></td></tr></table></figure>
+
+<p>마지막으로, /auth/login 시, passport.authenticate(‘local’) 방식으로 인증처리 되도록<br>수정한다.</p>
+<figure class="highlight objc"><figcaption><span>auth.controller.js</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">exports.login = (req, res, next) =&gt; &#123;</span><br><span class="line">    <span class="keyword">const</span> user = req.body;</span><br><span class="line">    console.log(<span class="string">'%s, %s'</span>, user.userid, user.password);</span><br><span class="line">    passport.authenticate(<span class="string">'local'</span>, &#123; session: <span class="literal">false</span> &#125;, (err, result, info) =&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (err) &#123;</span><br><span class="line">            <span class="keyword">return</span> next(err);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (result === null || result === <span class="literal">false</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> res.redirect(<span class="string">'/auth/login/fail'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> req.login(result, (error) =&gt; &#123;</span><br><span class="line">            console.log(<span class="string">'call req.login'</span>);</span><br><span class="line">            <span class="keyword">if</span> (error) &#123;</span><br><span class="line">                next(error);</span><br><span class="line">            &#125;</span><br><span class="line">            res.redirect(<span class="string">'/auth/login/success'</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;)(req, res, next);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Done.</p>
+
+            
+
+
+        </div>
+    </div>
+    <div id="post-footer" class="post-footer main-content-wrap">
+        
+            <div class="post-footer-tags">
+                <span class="text-color-light text-small">태그</span><br>
+                
+    <a class="tag tag--primary tag--small t-link" href="/tags/apiserver/" rel="tag">apiserver</a> <a class="tag tag--primary tag--small t-link" href="/tags/express/" rel="tag">express</a>
+
+            </div>
+        
+        
+            <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/10/nodejs-exports-module/" data-tooltip="Node.js 에서 exports vs Module.exports" aria-label="다음: Node.js 에서 exports vs Module.exports">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/15/express-apiserver-6/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/15/express-apiserver-6/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/15/express-apiserver-6/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="댓글을 남겨주세요">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+        
+        
+            
+                <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript" target="_blank" rel="noopener">comments powered by Disqus.</a></noscript>
+</div>
+            
+        
+    </div>
+</article>
+
+
+
+                <footer id="footer" class="main-content-wrap">
+    <span class="copyrights">
+        Copyrights &copy; 2020 akanamed. All Rights Reserved.
+    </span>
+</footer>
+
+            </div>
+            
+                <div id="bottom-bar" class="post-bottom-bar" data-behavior="4">
+                    <div class="post-actions-wrap">
+    <nav>
+        <ul class="post-actions post-action-nav">
+            <li class="post-action">
+                
+                    <a class="post-action-btn btn btn--disabled" aria-hidden="true">
+                        
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        <span class="hide-xs hide-sm text-small icon-ml">이전</span>
+                    </a>
+            </li>
+            <li class="post-action">
+                
+                    
+                <a class="post-action-btn btn btn--default tooltip--top" href="/2020/01/10/nodejs-exports-module/" data-tooltip="Node.js 에서 exports vs Module.exports" aria-label="다음: Node.js 에서 exports vs Module.exports">
+                    
+                        <span class="hide-xs hide-sm text-small icon-mr">다음</span>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                    </a>
+            </li>
+        </ul>
+    </nav>
+    <ul class="post-actions post-action-share">
+        <li class="post-action hide-lg hide-md hide-sm">
+            <a class="post-action-btn btn btn--default btn-open-shareoptions" href="#btn-open-shareoptions" aria-label="이 포스트 공유하기">
+                <i class="fa fa-share-alt" aria-hidden="true"></i>
+            </a>
+        </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/15/express-apiserver-6/" title="Facebook에 공유하기" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-facebook" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/15/express-apiserver-6/" title="Twitter에 공유하기" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-twitter" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+            
+            
+            <li class="post-action hide-xs">
+                <a class="post-action-btn btn btn--default" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/15/express-apiserver-6/" title="Google+에 공유하기" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                    <i class="fab fa-google-plus" aria-hidden="true"></i>
+                </a>
+            </li>
+        
+        
+            
+                <li class="post-action">
+                    <a class="post-action-btn btn btn--default" href="#disqus_thread" aria-label="댓글을 남겨주세요">
+                        <i class="fa fa-comment"></i>
+                    </a>
+                </li>
+            
+        
+        <li class="post-action">
+            
+                <a class="post-action-btn btn btn--default" href="#table-of-contents" aria-label="목차">
+            
+                <i class="fa fa-list" aria-hidden="true"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+                </div>
+                
+    <div id="share-options-bar" class="share-options-bar" data-behavior="4">
+        <i id="btn-close-shareoptions" class="fa fa-times"></i>
+        <ul class="share-options">
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://akanamed.github.io/2020/01/15/express-apiserver-6/" aria-label="Facebook에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-facebook" aria-hidden="true"></i><span>Facebook에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://twitter.com/intent/tweet?text=https://akanamed.github.io/2020/01/15/express-apiserver-6/" aria-label="Twitter에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-twitter" aria-hidden="true"></i><span>Twitter에 공유하기</span>
+                    </a>
+                </li>
+            
+                
+                
+                <li class="share-option">
+                    <a class="share-option-btn" target="_blank" href="https://plus.google.com/share?url=https://akanamed.github.io/2020/01/15/express-apiserver-6/" aria-label="Google+에 공유하기" rel="external nofollow noopener noreferrer">
+                        <i class="fab fa-google-plus" aria-hidden="true"></i><span>Google+에 공유하기</span>
+                    </a>
+                </li>
+            
+        </ul>
+    </div>
+
+
+            
+        </div>
+        
+
+
+<div id="about">
+    <div id="about-card">
+        <div id="about-btn-close">
+            <i class="fa fa-times"></i>
+        </div>
+        
+            <h4 id="about-card-name">akanamed</h4>
+        
+            <div id="about-card-bio"><p>Programmer</p>
+</div>
+        
+        
+            <div id="about-card-job">
+                <i class="fa fa-briefcase"></i>
+                <br>
+                <p>Game Server</p>
+
+            </div>
+        
+        
+            <div id="about-card-location">
+                <i class="fa fa-map-marker-alt"></i>
+                <br>
+                Seoul, Korea
+            </div>
+        
+    </div>
+</div>
+
+        
+        
+<div id="cover" style="background-image:url('/assets/images/cover.jpg');"></div>
+        <!--SCRIPTS-->
+
+<script src="/assets/js/script-azyaxdbdxqyxe97nvf72hm0mrtxjd9ihias9hefytvnykjrcsingzw8swgno.min.js"></script>
+
+<!--SCRIPTS END-->
+
+
+    
+        <script>
+          var disqus_config = function() {
+            this.page.url = 'https://akanamed.github.io/2020/01/15/express-apiserver-6/';
+              
+            this.page.identifier = '2020/01/15/express-apiserver-6/';
+              
+          };
+          (function() {
+            var d = document, s = d.createElement('script');
+            var disqus_shortname = 'gameserverdevelop';
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+          })();
+        </script>
+    
+
+
+
+
+    </body>
+</html>
